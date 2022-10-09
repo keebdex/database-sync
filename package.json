@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@googleapis/docs": "^1.0.1",
+    "axios": "^1.1.2",
+    "camaro": "^6.2.0",
+    "dotenv": "^16.0.3",
+    "googleapis": "^108.0.0",
+    "lodash": "^4.17.21",
+    "parse5": "^7.1.1",
+    "slugify": "^1.6.5"
+  }
+}
