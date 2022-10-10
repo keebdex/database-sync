@@ -1,8 +1,11 @@
+const { format, parse } = require('date-fns')
 const { get, chunk, flatten } = require('lodash')
 const parse5 = require('parse5')
-const { default: slugify } = require('slugify')
+const slugify = require('slugify').default
 
 const regRelease = /\(([a-zA-Z ]*\d{4})\)/gim
+const jellyReg = /\((\d{4}\/[01]\d\/[0-3]\d)\)/gim
+
 const regQty = /\(count (\d+)\)/gim
 const regCommission = /\(\*\)/gim
 const regGiveaway = /\(giveaway\)|\(give-away\)/gim
@@ -23,7 +26,7 @@ const attrs = {
     },
 }
 
-const parseSculpt = (table) => {
+const parseSculpt = (table, maker_id) => {
     // table.tbody.tr.td
     let text = table.childNodes[0]?.childNodes[0]?.childNodes[0].childNodes
         .map((n) => n.childNodes[0]?.childNodes[0]?.value)
@@ -35,6 +38,17 @@ const parseSculpt = (table) => {
     if (releaseMatch) {
         sculpt.release = releaseMatch[1]
         text = text.replace(regRelease, '')
+    }
+
+    if (maker_id === 'jelly-key') {
+        const dateMatch = jellyReg.exec(text)
+        if (dateMatch) {
+            sculpt.release = format(
+                parse(dateMatch[1], 'yyyy/MM/dd', new Date()),
+                'dd MMM yyyy'
+            )
+            text = text.replace(jellyReg, '')
+        }
     }
 
     Object.entries(attrs).forEach(([attr, obj]) => {
@@ -69,7 +83,7 @@ const parser = (html, maker_id) => {
             return null
         }
 
-        const sculpt = parseSculpt(chunk[0])
+        const sculpt = parseSculpt(chunk[0], maker_id)
 
         const cells = flatten(
             chunk[1].childNodes[0].childNodes.map((n) => n.childNodes)
@@ -84,23 +98,25 @@ const parser = (html, maker_id) => {
             }
 
             const texts = []
+
+            // td.span
             cell.childNodes.forEach((n) => {
-                const node = n.childNodes[0]?.childNodes[0]
-                switch (node?.nodeName) {
-                    case 'img':
-                        const attr = n.childNodes[0].childNodes[0].attrs.find(
-                            (a) => a.name === 'src'
-                        )
-                        if (attr) {
-                            colorway.img = attr.value
-                        }
-                        break
-                    case '#text':
-                        texts.push(n.childNodes[0]?.childNodes[0]?.value)
-                        break
-                    default:
-                        break
-                }
+                const nodes = flatten(n.childNodes.map((cn) => cn.childNodes))
+                nodes.forEach((cn) => {
+                    switch (cn.nodeName) {
+                        case 'img':
+                            const attr = cn.attrs.find((a) => a.name === 'src')
+                            if (attr) {
+                                colorway.img = attr.value
+                            }
+                            break
+                        case '#text':
+                            texts.push(cn.value)
+                            break
+                        default:
+                            break
+                    }
+                })
             })
 
             let text = texts.join(' ')
@@ -127,6 +143,17 @@ const parser = (html, maker_id) => {
             if (giveawayMatch) {
                 colorway.giveaway = true
                 text = text.replace(regGiveaway, '')
+            }
+
+            if (maker_id === 'fraktal-kaps') {
+                if (text.includes('°')) {
+                    colorway.commissioned = true
+                    text = text.replace('°', '')
+                }
+                if (text.includes('*')) {
+                    colorway.qty = 1
+                    text = text.replace('*', '')
+                }
             }
 
             colorway.name = text.trim()
