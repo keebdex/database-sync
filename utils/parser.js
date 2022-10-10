@@ -26,13 +26,19 @@ const attrs = {
     },
 }
 
+const normalize = (text) => {
+    return text.replace(/(“|”)/g, '"').replace(/(‘|’)/g, "'").trim()
+}
+
 const parseSculpt = (table, maker_id) => {
     // table.tbody.tr.td
     let text = table.childNodes[0]?.childNodes[0]?.childNodes[0].childNodes
         .map((n) => n.childNodes[0]?.childNodes[0]?.value)
         .join(' ')
 
-    const sculpt = {}
+    const sculpt = {
+        maker_id,
+    }
 
     const releaseMatch = regRelease.exec(text)
     if (releaseMatch) {
@@ -60,7 +66,7 @@ const parseSculpt = (table, maker_id) => {
         })
     })
 
-    sculpt.name = text.trim()
+    sculpt.name = normalize(text)
     sculpt.sculpt_id = slugify(sculpt.name, { lower: true })
 
     return sculpt
@@ -76,6 +82,10 @@ const parser = (html, maker_id) => {
     const tables = body.childNodes.filter(
         (n) => n.nodeName === 'table' && n.tagName === 'table'
     )
+
+    if (maker_id === 'goldenstar-keycap') {
+        tables.shift() // remove first item as it's quicklinks table
+    }
 
     const chunks = chunk(tables, 2)
     const sculpts = chunks.map((chunk) => {
@@ -156,7 +166,8 @@ const parser = (html, maker_id) => {
                 }
             }
 
-            colorway.name = text.trim()
+            colorway.name = normalize(text)
+            colorway.colorway_id = slugify(colorway.name, { lower: true })
 
             colorways.push(colorway)
         })
