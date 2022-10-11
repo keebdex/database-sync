@@ -16,7 +16,6 @@ const getMakers = () => {
     return supabase
         .from('makers')
         .select()
-        .neq('deleted', true)
         .then(({ data }) => {
             return data
                 .filter((m) => m.src.includes('docs.google.com'))

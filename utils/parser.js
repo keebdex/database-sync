@@ -4,7 +4,7 @@ const parse5 = require('parse5')
 const slugify = require('slugify').default
 
 const regRelease = /\(([a-zA-Z ]*\d{4})\)/gim
-const jellyReg = /\((\d{4}\/[01]\d\/[0-3]\d)\)/gim
+const jellyReg = /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim
 
 const regQty = /\(count (\d+)\)/gim
 const regCommission = /\(\*\)/gim
@@ -33,11 +33,17 @@ const normalize = (text) => {
 const parseSculpt = (table, maker_id) => {
     // table.tbody.tr.td
     let text = table.childNodes[0]?.childNodes[0]?.childNodes[0].childNodes
-        .map((n) => n.childNodes[0]?.childNodes[0]?.value)
+        .map((n) => {
+            const spans = flatten(n.childNodes.map((cn) => cn.childNodes))
+            return spans.map((s) => s.value).join('')
+        })
         .join(' ')
 
     const sculpt = {
         maker_id,
+        release: null,
+        profile: null,
+        cast: null,
     }
 
     const releaseMatch = regRelease.exec(text)
@@ -50,7 +56,7 @@ const parseSculpt = (table, maker_id) => {
         const dateMatch = jellyReg.exec(text)
         if (dateMatch) {
             sculpt.release = format(
-                parse(dateMatch[1], 'yyyy/MM/dd', new Date()),
+                parse(dateMatch[1], 'yyyy/M/d', new Date()),
                 'dd MMM yyyy'
             )
             text = text.replace(jellyReg, '')
