@@ -105,6 +105,8 @@ const parser = (html, maker_id) => {
                 name: '',
                 sculpt_id: sculpt.sculpt_id,
                 maker_id,
+                giveaway: false,
+                commissioned: false,
             }
 
             const texts = []

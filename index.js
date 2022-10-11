@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const { createClient } = require('@supabase/supabase-js')
+const { writeFileSync } = require('fs')
 const { downloader } = require('./utils/docs')
 const { parser } = require('./utils/parser')
 
@@ -9,10 +10,13 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 )
 
+const isDevelopment = process.env.NODE_ENV !== 'production'
+
 const getMakers = () => {
     return supabase
         .from('makers')
         .select()
+        .neq('deleted', true)
         .then(({ data }) => {
             return data
                 .filter((m) => m.src.includes('docs.google.com'))
@@ -26,18 +30,19 @@ const getMakers = () => {
 }
 
 const updateDatabase = async (data) => {
-    const colors = []
+    let colors = []
     const sculpts = data.map(({ colorways, ...rest }) => {
-        colors.concat(colorways)
+        colors = colors.concat(colorways)
         return rest
     })
 
-    const { error } = await supabase.from('sculpts_duplicate').upsert(sculpts)
+    const { error } = await supabase.from('sculpts').upsert(sculpts)
     if (error) {
         console.error('update sculpts error', error)
     }
 
     const { error: err } = await supabase.from('colorways').upsert(colors)
+
     if (err) {
         console.error('update colorways error', err)
     }
@@ -50,18 +55,20 @@ getMakers().then((makers) => {
         downloader(maker.document_id)
             .then((html) => parser(html, maker.id))
             .then((data) => {
-                require('fs').writeFileSync(
-                    `db/${maker.id}.json`,
-                    JSON.stringify(data, null, 2),
-                    () => {
-                        console.log('done', maker.id)
-                    }
-                )
+                if (isDevelopment) {
+                    writeFileSync(
+                        `db/${maker.id}.json`,
+                        JSON.stringify(data, null, 2),
+                        () => {
+                            console.log('done', maker.id)
+                        }
+                    )
+                }
 
                 updateDatabase(data)
             })
             .catch((err) => {
-                console.log(
+                console.error(
                     'catalogue deleted or sth went wrong',
                     maker.id,
                     err.message
