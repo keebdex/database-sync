@@ -28,7 +28,7 @@ const getMakers = () => {
         })
 }
 
-const updateDatabase = async (data) => {
+const updateDatabase = async (maker_id, data) => {
     let colors = []
     const sculpts = data.map(({ colorways, ...rest }) => {
         colors = colors.concat(colorways)
@@ -37,13 +37,13 @@ const updateDatabase = async (data) => {
 
     const { error } = await supabase.from('sculpts').upsert(sculpts)
     if (error) {
-        console.error('update sculpts error', error)
+        console.error('update sculpts error', maker_id, error)
     }
 
     const { error: err } = await supabase.from('colorways').upsert(colors)
 
     if (err) {
-        console.error('update colorways error', err)
+        console.error('update colorways error', maker_id, err)
     }
 }
 
@@ -64,7 +64,7 @@ getMakers().then((makers) => {
                     )
                 }
 
-                updateDatabase(data)
+                updateDatabase(maker.id, data)
             })
             .catch((err) => {
                 console.error(

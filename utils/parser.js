@@ -1,7 +1,8 @@
+const { crc32 } = require('crc')
 const { format, parse } = require('date-fns')
 const { get, chunk, flatten } = require('lodash')
 const parse5 = require('parse5')
-const slugify = require('slugify').default
+const { default: slugify } = require('slugify')
 
 const regRelease = /\(([a-zA-Z ]*\d{4})\)/gim
 const jellyReg = /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim
@@ -27,7 +28,11 @@ const attrs = {
 }
 
 const normalize = (text) => {
-    return text.replace(/(“|”)/g, '"').replace(/(‘|’)/g, "'").trim()
+    return text
+        .replace('(ka_cover)', '')
+        .replace(/(“|”)/g, '"')
+        .replace(/(‘|’)/g, "'")
+        .trim()
 }
 
 const parseSculpt = (table, maker_id) => {
@@ -42,6 +47,7 @@ const parseSculpt = (table, maker_id) => {
     const sculpt = {
         maker_id,
         release: null,
+        design: null,
         profile: null,
         cast: null,
     }
@@ -106,13 +112,16 @@ const parser = (html, maker_id) => {
         )
 
         const colorways = []
-        cells.forEach((cell) => {
+        cells.forEach((cell, order) => {
             const colorway = {
                 name: '',
                 sculpt_id: sculpt.sculpt_id,
                 maker_id,
                 giveaway: false,
                 commissioned: false,
+                release: null,
+                qty: null,
+                order,
             }
 
             const texts = []
@@ -175,7 +184,12 @@ const parser = (html, maker_id) => {
             }
 
             colorway.name = normalize(text)
-            colorway.colorway_id = slugify(colorway.name, { lower: true })
+
+            const slug = slugify(colorway.name, { lower: true })
+
+            colorway.colorway_id = crc32(
+                `${maker_id}-${sculpt.sculpt_id}-${slug}-${order}`
+            ).toString(16)
 
             colorways.push(colorway)
         })

@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "@googleapis/docs": "^1.0.1",
     "@supabase/supabase-js": "^1.35.7",
     "axios": "^1.1.2",
     "camaro": "^6.2.0",
+    "crc": "^4.1.1",
     "date-fns": "^2.29.3",
     "dotenv": "^16.0.3",
     "googleapis": "^108.0.0",
