@@ -1,53 +1,13 @@
 require('dotenv').config()
 
-const { createClient } = require('@supabase/supabase-js')
 const { writeFileSync } = require('fs')
+const { getGDocMakers, updateDatabase } = require('./utils/database')
 const { downloader } = require('./utils/docs')
 const { parser } = require('./utils/parser')
 
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
-)
-
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-const getMakers = () => {
-    return supabase
-        .from('makers')
-        .select()
-        .then(({ data }) => {
-            return data
-                .filter((m) => m.src.includes('docs.google.com'))
-                .map((m) => {
-                    return {
-                        id: m.id,
-                        document_id: m.src.split('/')[5],
-                    }
-                })
-        })
-}
-
-const updateDatabase = async (maker_id, data) => {
-    let colors = []
-    const sculpts = data.map(({ colorways, ...rest }) => {
-        colors = colors.concat(colorways)
-        return rest
-    })
-
-    const { error } = await supabase.from('sculpts').upsert(sculpts)
-    if (error) {
-        console.error('update sculpts error', maker_id, error)
-    }
-
-    const { error: err } = await supabase.from('colorways').upsert(colors)
-
-    if (err) {
-        console.error('update colorways error', maker_id, err)
-    }
-}
-
-getMakers().then((makers) => {
+getGDocMakers().then((makers) => {
     makers.forEach((maker) => {
         console.log('start downloading:', maker.id)
 

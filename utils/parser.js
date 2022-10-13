@@ -1,6 +1,6 @@
 const { crc32 } = require('crc')
 const { format, parse } = require('date-fns')
-const { get, chunk, flatten } = require('lodash')
+const { chunk, flatten, findLast } = require('lodash')
 const parse5 = require('parse5')
 const { default: slugify } = require('slugify')
 
@@ -50,6 +50,7 @@ const parseSculpt = (table, maker_id) => {
         design: null,
         profile: null,
         cast: null,
+        img: null,
     }
 
     const releaseMatch = regRelease.exec(text)
@@ -195,6 +196,10 @@ const parser = (html, maker_id) => {
         })
 
         sculpt.colorways = colorways.filter((c) => c.img)
+        const last = findLast(sculpt.colorways)
+        if (last) {
+            sculpt.img = last.img
+        }
 
         return sculpt
     })
