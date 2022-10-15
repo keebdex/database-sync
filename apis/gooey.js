@@ -16,7 +16,7 @@ const downloader = async () => {
     const sculpts = data.sculpts.map((sculpt) => {
         const sculpt_id = slugify(sculpt.name, { lower: true })
 
-        const colorways = sculpt.colorways.map((colorway) => {
+        const colorways = sculpt.colorways.map((colorway, order) => {
             const { name, img, releaseDate: release } = colorway
 
             return {
@@ -28,6 +28,7 @@ const downloader = async () => {
                 colorway_id: crc32(
                     `${maker_id}-${sculpt_id}-${slugify(name, { lower: true })}`
                 ).toString(16),
+                order,
             }
         })
 

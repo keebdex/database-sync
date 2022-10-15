@@ -7,21 +7,20 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 )
 
-const getGDocMakers = () => {
-    return supabase
+const getGDocMakers = () =>
+    supabase
         .from('makers')
         .select()
-        .then(({ data }) => {
-            return data
-                .filter((m) => m.src.includes('docs.google.com'))
-                .map((m) => {
-                    return {
-                        id: m.id,
-                        document_id: m.src.split('/')[5],
-                    }
-                })
-        })
-}
+        .like('src', '%docs.google.com%')
+        .neq('deleted', true)
+        .then(({ data }) =>
+            data.map((m) => {
+                return {
+                    id: m.id,
+                    document_id: m.src.split('/')[5],
+                }
+            })
+        )
 
 const updateDatabase = async (maker_id, data) => {
     let colors = []
@@ -30,15 +29,20 @@ const updateDatabase = async (maker_id, data) => {
         return rest
     })
 
-    const { error } = await supabase.from('sculpts').upsert(sculpts)
-    if (error) {
-        console.error('update sculpts error', maker_id, error)
+    const sculpt = await supabase
+        .from('sculpts')
+        .upsert(sculpts, { returning: 'minimal' })
+
+    if (sculpt.error) {
+        console.error('update sculpts error', maker_id, sculpt.error)
     }
 
-    const { error: err } = await supabase.from('colorways').upsert(colors)
+    const colorway = await supabase
+        .from('colorways')
+        .upsert(colors, { returning: 'minimal' })
 
-    if (err) {
-        console.error('update colorways error', maker_id, err)
+    if (colorway.error) {
+        console.error('update colorways error', maker_id, colorway.error)
     }
 
     console.log(

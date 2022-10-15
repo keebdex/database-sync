@@ -17,7 +17,7 @@ const sculptScraper = async ([sculpt_id, sculpt_name]) => {
 
     const nodes = xpath.fromPageSource(data).findElements('//figure')
 
-    return nodes.map((node) => {
+    return nodes.map((node, order) => {
         const text = xpath.fromNode(node).findElement('//strong').getText()
         const img = xpath
             .fromNode(node)
@@ -34,6 +34,7 @@ const sculptScraper = async ([sculpt_id, sculpt_name]) => {
             colorway_id: crc32(
                 `${maker_id}-${sculpt_id}-${slugify(name, { lower: true })}`
             ).toString(16),
+            order,
         }
     })
 }
