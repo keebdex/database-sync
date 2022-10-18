@@ -29,17 +29,13 @@ const updateDatabase = async (maker_id, data) => {
         return rest
     })
 
-    const sculpt = await supabase
-        .from('sculpts')
-        .upsert(sculpts, { returning: 'minimal' })
+    const sculpt = await supabase.from('sculpts').upsert(sculpts)
 
     if (sculpt.error) {
         console.error('update sculpts error', maker_id, sculpt.error)
     }
 
-    const colorway = await supabase
-        .from('colorways')
-        .upsert(colors, { returning: 'minimal' })
+    const colorway = await supabase.from('colorways').upsert(colors)
 
     if (colorway.error) {
         console.error('update colorways error', maker_id, colorway.error)
