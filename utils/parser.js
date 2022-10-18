@@ -204,7 +204,9 @@ const parser = (html, maker_id) => {
         return sculpt
     })
 
-    return sculpts.filter((s) => !!s)
+    return sculpts.filter(
+        (s) => !!s || (s && s.name) || (s && s.colorways.length)
+    )
 }
 
 module.exports = { parser }
