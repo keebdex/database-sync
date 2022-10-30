@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 const { writeFileSync } = require('fs')
-const { getGDocMakers, updateDatabase } = require('./utils/database')
+const { getGDocMakers, updateMaker } = require('./utils/database')
 const { downloader } = require('./utils/docs')
 const { parser } = require('./utils/parser')
 
@@ -24,7 +24,7 @@ getGDocMakers().then((makers) => {
                     )
                 }
 
-                updateDatabase(maker.id, data)
+                updateMaker(maker.id, data)
             })
             .catch((err) => {
                 console.error(

@@ -4,7 +4,7 @@ const { writeFileSync } = require('fs')
 const axios = require('axios')
 const xpath = require('xpath-html')
 const { findLast } = require('lodash')
-const { updateDatabase } = require('../utils/database')
+const { updateMaker } = require('../utils/database')
 
 const baseUrl = 'https://alphakeycaps.com'
 const maker_id = 'alpha-keycaps'
@@ -73,7 +73,7 @@ const downloader = async () => {
         writeFileSync(`db/${maker_id}.json`, JSON.stringify(sculpts, null, 2))
     }
 
-    updateDatabase(maker_id, sculpts)
+    updateMaker(maker_id, sculpts)
 }
 
 downloader()

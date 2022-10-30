@@ -3,7 +3,7 @@ const { crc32 } = require('crc')
 const { writeFileSync } = require('fs')
 const { findLast } = require('lodash')
 const { default: slugify } = require('slugify')
-const { updateDatabase } = require('../utils/database')
+const { updateMaker } = require('../utils/database')
 
 const maker_id = 'gooey-keys'
 
@@ -46,7 +46,7 @@ const downloader = async () => {
         writeFileSync(`db/${maker_id}.json`, JSON.stringify(sculpts, null, 2))
     }
 
-    updateDatabase(maker_id, sculpts)
+    updateMaker(maker_id, sculpts)
 }
 
 downloader()

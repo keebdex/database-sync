@@ -7,6 +7,13 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 )
 
+const upsert = async (table, data) => {
+    const { error } = await supabase.from(table).upsert(data)
+    if (error) {
+        console.warn(`update table '${table}' error`, data[0].maker_id, error)
+    }
+}
+
 const getGDocMakers = () =>
     supabase
         .from('makers')
@@ -22,23 +29,41 @@ const getGDocMakers = () =>
             })
         )
 
-const updateDatabase = async (maker_id, data) => {
+const updateMaker = async (maker_id, data) => {
     let colors = []
     const sculpts = data.map(({ colorways, ...rest }) => {
         colors = colors.concat(colorways)
         return rest
     })
 
-    const sculpt = await supabase.from('sculpts').upsert(sculpts)
+    /**
+     * FIXME: need to find a better solution
+     * with this fix, the crawler will not override the manual input data if empty
+     * it might be wrong if the catalog maintainer input/remove wrong data
+     */
+    const releaseOnly = colors
+        .filter((c) => c.release && !c.qty)
+        .map(({ qty, ...rest }) => rest)
+    const qtyOnly = colors
+        .filter((c) => !c.release && c.qty)
+        .map(({ release, ...rest }) => rest)
+    const hasNoExtra = colors
+        .filter((c) => !c.release && !c.qty)
+        .map(({ release, qty, ...rest }) => rest)
+    const hasExtra = colors.filter((c) => c.release && c.qty)
 
-    if (sculpt.error) {
-        console.error('update sculpts error', maker_id, sculpt.error)
+    await upsert('sculpts', sculpts)
+    if (releaseOnly.length) {
+        await upsert('colorways', releaseOnly)
     }
-
-    const colorway = await supabase.from('colorways').upsert(colors)
-
-    if (colorway.error) {
-        console.error('update colorways error', maker_id, colorway.error)
+    if (qtyOnly.length) {
+        await upsert('colorways', qtyOnly)
+    }
+    if (hasNoExtra.length) {
+        await upsert('colorways', hasNoExtra)
+    }
+    if (hasExtra.length) {
+        await upsert('colorways', hasExtra)
     }
 
     console.log(
@@ -51,4 +76,4 @@ const updateDatabase = async (maker_id, data) => {
     )
 }
 
-module.exports = { getGDocMakers, updateDatabase }
+module.exports = { getGDocMakers, updateMaker }
