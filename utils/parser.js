@@ -184,6 +184,16 @@ const parser = (html, maker_id) => {
                 }
             }
 
+            if (maker_id === 'hello-caps') {
+                if (text.includes('*')) {
+                    colorway.commissioned = true
+                    text = text
+                        .replace('( * )', '')
+                        .replace('*', '')
+                        .replace('  ', '')
+                }
+            }
+
             colorway.name = normalize(text)
 
             const slug = slugify(colorway.name, { lower: true })
