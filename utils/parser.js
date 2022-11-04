@@ -37,7 +37,13 @@ const normalize = (text) => {
 
 const parseSculpt = (table, maker_id) => {
     // table.tbody.tr.td
-    let text = table.childNodes[0]?.childNodes[0]?.childNodes[0].childNodes
+    let nodes = table.childNodes[0]?.childNodes[0]?.childNodes[0].childNodes
+    if (maker_id === 'nightcaps' || maker_id === 'latrialum') {
+        // to remove extra info from second line in sculpt name (nightcaps, latrialum)
+        nodes = nodes.filter((n) => n.nodeName === 'h1' && n.tagName === 'h1')
+    }
+
+    let text = nodes
         .map((n) => {
             const spans = flatten(n.childNodes.map((cn) => cn.childNodes))
             return spans.map((s) => s.value).join('')
