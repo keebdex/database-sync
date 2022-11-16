@@ -37,18 +37,18 @@ const normalize = (text) => {
 
 const parseSculpt = (table, maker_id) => {
     // table.tbody.tr.td
-    let nodes = table.childNodes[0]?.childNodes[0]?.childNodes[0].childNodes
-    if (maker_id === 'nightcaps' || maker_id === 'latrialum') {
-        // to remove extra info from second line in sculpt name (nightcaps, latrialum)
-        nodes = nodes.filter((n) => n.nodeName === 'h1' && n.tagName === 'h1')
-    }
+    let [titleNodes, attrNodes] =
+        table.childNodes[0]?.childNodes[0]?.childNodes[0].childNodes
 
-    let text = nodes
-        .map((n) => {
-            const spans = flatten(n.childNodes.map((cn) => cn.childNodes))
-            return spans.map((s) => s.value).join('')
-        })
-        .join(' ')
+    let text = flatten(titleNodes.childNodes.map((cn) => cn.childNodes))
+        .map((s) => s.value)
+        .join('')
+    let subtext = attrNodes
+        ? flatten(attrNodes.childNodes.map((cn) => cn.childNodes))
+              .map((s) => s.value)
+              .join('')
+              .toLowerCase()
+        : ''
 
     const sculpt = {
         maker_id,
@@ -59,7 +59,7 @@ const parseSculpt = (table, maker_id) => {
         img: null,
     }
 
-    const releaseMatch = regRelease.exec(text)
+    let releaseMatch = regRelease.exec(text) || regRelease.exec(subtext)
     if (releaseMatch) {
         sculpt.release = releaseMatch[1]
         text = text.replace(regRelease, '')
@@ -78,9 +78,9 @@ const parseSculpt = (table, maker_id) => {
 
     Object.entries(attrs).forEach(([attr, obj]) => {
         Object.entries(obj).forEach(([key, value]) => {
-            if (text.includes(value)) {
+            if (subtext.includes(value)) {
                 sculpt[attr] = key
-                text = text.replace(value, '')
+                subtext = subtext.replace(value, '')
             }
         })
     })
@@ -98,12 +98,21 @@ const parser = (html, maker_id) => {
         (n) => n.nodeName === 'body'
     )
 
-    const tables = body.childNodes.filter(
+    let tables = body.childNodes.filter(
         (n) => n.nodeName === 'table' && n.tagName === 'table'
     )
 
     if (maker_id === 'goldenstar-keycap') {
         tables.shift() // remove first item as it's quicklinks table
+    }
+
+    if (maker_id === 'rathcaps') {
+        // FIXME: i dont know, but there is a table break in Sapling V2, so we did this manual fix
+        tables[7].childNodes[0].childNodes =
+            tables[7].childNodes[0].childNodes.concat(
+                tables[8].childNodes[0].childNodes
+            )
+        tables = tables.filter((t, i) => i !== 8)
     }
 
     const chunks = chunk(tables, 2)
@@ -220,9 +229,7 @@ const parser = (html, maker_id) => {
         return sculpt
     })
 
-    return sculpts.filter(
-        (s) => !!s || (s && s.name) || (s && s.colorways.length)
-    )
+    return sculpts.filter(s => s && s.name && s.colorways.length)
 }
 
 module.exports = { parser }
