@@ -4,7 +4,7 @@ const { chunk, flatten, findLast } = require('lodash')
 const parse5 = require('parse5')
 const { default: slugify } = require('slugify')
 
-const regRelease = /\(([a-zA-Z ]*\d{4})\)/gim
+const regRelease = /\(([a-zA-Z0-9 ]*\d{4})\)/gim
 const jellyReg = /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim
 
 const regQty = /\(count (\d+)\)/gim
