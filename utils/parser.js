@@ -102,10 +102,6 @@ const parser = (html, maker_id) => {
         (n) => n.nodeName === 'table' && n.tagName === 'table'
     )
 
-    if (maker_id === 'goldenstar-keycap') {
-        tables.shift() // remove first item as it's quicklinks table
-    }
-
     if (maker_id === 'rathcaps') {
         // FIXME: i dont know, but there is a table break in Sapling V2, so we did this manual fix
         tables[7].childNodes[0].childNodes =
