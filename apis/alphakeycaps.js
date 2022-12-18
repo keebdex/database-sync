@@ -1,10 +1,10 @@
 const { crc32 } = require('crc')
-const { default: slugify } = require('slugify')
 const { writeFileSync } = require('fs')
 const axios = require('axios')
 const xpath = require('xpath-html')
 const { findLast } = require('lodash')
 const { updateMaker } = require('../utils/database')
+const { slugify } = require('../utils/slugify')
 
 const baseUrl = 'https://alphakeycaps.com'
 const maker_id = 'alpha-keycaps'
@@ -32,7 +32,7 @@ const sculptScraper = async ([sculpt_id, sculpt_name]) => {
             maker_id,
             sculpt_id,
             colorway_id: crc32(
-                `${maker_id}-${sculpt_id}-${slugify(name, { lower: true })}`
+                `${maker_id}-${sculpt_id}-${slugify(name)}`
             ).toString(16),
             order,
         }

@@ -2,7 +2,7 @@ const { crc32 } = require('crc')
 const { format, parse } = require('date-fns')
 const { chunk, flatten, findLast } = require('lodash')
 const parse5 = require('parse5')
-const { default: slugify } = require('slugify')
+const { slugify, urlSlugify } = require('./slugify')
 
 const regRelease = /\(([a-zA-Z0-9 ]*\d{4})\)/gim
 const jellyReg = /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim
@@ -86,7 +86,7 @@ const parseSculpt = (table, maker_id) => {
     })
 
     sculpt.name = normalize(text)
-    sculpt.sculpt_id = slugify(sculpt.name, { lower: true })
+    sculpt.sculpt_id = urlSlugify(sculpt.name)
 
     return sculpt
 }
@@ -207,7 +207,7 @@ const parser = (html, maker_id) => {
 
             colorway.name = normalize(text)
 
-            const slug = slugify(colorway.name, { lower: true })
+            const slug = slugify(colorway.name)
 
             colorway.colorway_id = crc32(
                 `${maker_id}-${sculpt.sculpt_id}-${slug}-${order}`

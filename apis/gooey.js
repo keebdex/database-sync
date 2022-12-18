@@ -2,8 +2,8 @@ const axios = require('axios')
 const { crc32 } = require('crc')
 const { writeFileSync } = require('fs')
 const { findLast } = require('lodash')
-const { default: slugify } = require('slugify')
 const { updateMaker } = require('../utils/database')
+const { slugify, urlSlugify } = require('../utils/slugify')
 
 const maker_id = 'gooey-keys'
 
@@ -14,7 +14,7 @@ const downloader = async () => {
     })
 
     const sculpts = data.sculpts.map((sculpt) => {
-        const sculpt_id = slugify(sculpt.name, { lower: true })
+        const sculpt_id = urlSlugify(sculpt.name)
 
         const colorways = sculpt.colorways.map((colorway, order) => {
             const { name, img, releaseDate: release } = colorway
@@ -26,7 +26,7 @@ const downloader = async () => {
                 sculpt_id,
                 release,
                 colorway_id: crc32(
-                    `${maker_id}-${sculpt_id}-${slugify(name, { lower: true })}`
+                    `${maker_id}-${sculpt_id}-${slugify(name)}`
                 ).toString(16),
                 order,
             }

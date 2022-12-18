@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/anhthang/keebtalogue-prometheus#readme",
   "dependencies": {
-    "@supabase/supabase-js": "^2.1.2",
+    "@supabase/supabase-js": "^2.2.1",
     "axios": "^1.2.1",
     "camaro": "^6.2.0",
-    "crc": "^4.1.1",
+    "crc": "^4.2.0",
     "date-fns": "^2.29.3",
     "dotenv": "^16.0.3",
     "googleapis": "^109.0.1",
