@@ -205,6 +205,12 @@ const parser = (html, maker_id) => {
                 }
             }
 
+            if (maker_id === 'keycat') {
+                if (text.includes('(GB)')) {
+                    text = text.replace('(GB)', '')
+                }
+            }
+
             colorway.name = normalize(text)
 
             const slug = slugify(colorway.name)
