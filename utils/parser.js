@@ -102,15 +102,6 @@ const parser = (html, maker_id) => {
         (n) => n.nodeName === 'table' && n.tagName === 'table'
     )
 
-    if (maker_id === 'rathcaps') {
-        // FIXME: i dont know, but there is a table break in Sapling V2, so we did this manual fix
-        tables[7].childNodes[0].childNodes =
-            tables[7].childNodes[0].childNodes.concat(
-                tables[8].childNodes[0].childNodes
-            )
-        tables = tables.filter((t, i) => i !== 8)
-    }
-
     const chunks = chunk(tables, 2)
     const sculpts = chunks.map((chunk) => {
         if (chunk.length === 1) {
