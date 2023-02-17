@@ -9,7 +9,7 @@ const { slugify } = require('../utils/slugify')
 const baseUrl = 'https://alphakeycaps.com'
 const maker_id = 'alpha-keycaps'
 
-const sculptScraper = async ([sculpt_id, sculpt_name]) => {
+const sculptScraper = async (sculpt_id, sculpt_name) => {
     const { data } = await axios({
         method: 'get',
         url: `${baseUrl}/${sculpt_id}`,
@@ -39,30 +39,32 @@ const sculptScraper = async ([sculpt_id, sculpt_name]) => {
     })
 }
 
-const catalogs = {
-    'darth-looga': 'Darth Looga',
-    'mf-belooga': 'MF Belooga',
-    keypora: 'Keypora',
-    'jedi-blinker': 'Jedi Blinker',
-    blinker: 'Blinker',
-    matapora: 'Matapora',
-    'alpha-ape': 'Alpha Ape',
-    cherep: 'Cherep',
-    salvador: 'Salvador',
-    albison: 'Albison',
-    'mr-worldwide': 'Mr Worldwide',
-    'boosted-gamer-set': 'Boosted Gamer Set',
-    geekpora: 'Geekpora',
-}
+const catalogs = [
+    'Darth Looga',
+    'MF Belooga',
+    'Keypora',
+    'Jedi Blinker',
+    'Blinker',
+    'Matapora',
+    'Alpha Ape',
+    'Cherep',
+    'Salvador',
+    'Albison',
+    'Mr Worldwide',
+    'Boosted Gamer Set',
+    'Geekpora',
+    'Prayge',
+]
 
 const downloader = async () => {
     const sculpts = await Promise.all(
-        Object.entries(catalogs).map(async (sculpt) => {
-            const colorways = await sculptScraper(sculpt)
+        catalogs.map(async (name) => {
+            const sculpt_id = slugify(name)
+            const colorways = await sculptScraper(sculpt_id, name)
             return {
-                name: sculpt[1],
+                name,
                 maker_id,
-                sculpt_id: sculpt[0],
+                sculpt_id,
                 colorways,
                 img: findLast(colorways).img,
             }
