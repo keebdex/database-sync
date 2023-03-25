@@ -54,6 +54,7 @@ const catalogs = [
     'Boosted Gamer Set',
     'Geekpora',
     'Prayge',
+    'Devoura'
 ]
 
 const downloader = async () => {
