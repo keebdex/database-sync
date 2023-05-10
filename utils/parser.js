@@ -6,6 +6,7 @@ const { slugify, urlSlugify } = require('./slugify')
 
 const regRelease = /\(([a-zA-Z0-9 ]*\d{4})\)/gim
 const jellyReg = /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim
+const dreadkeysCommission = /\(Commission\)|\(Comission\)/gim
 
 const regQty = /\(count (\d+)\)/gim
 const regCommission = /\(\*\)/gim
@@ -199,6 +200,14 @@ const parser = (html, maker_id) => {
             if (maker_id === 'keycat') {
                 if (text.includes('(GB)')) {
                     text = text.replace('(GB)', '')
+                }
+            }
+
+            if (maker_id === 'dreadkeys') {
+                const isCommission = dreadkeysCommission.exec(text)
+                if (isCommission) {
+                    colorway.commissioned = true
+                    text = text.replace(dreadkeysCommission, '')
                 }
             }
 
