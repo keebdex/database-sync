@@ -83,6 +83,10 @@ const parseSculpt = (table, maker_id) => {
                 sculpt[attr] = key
                 subtext = subtext.replace(value, '')
             }
+            if (text.includes(value)) {
+                sculpt[attr] = key
+                text = text.replace(value, '')
+            }
         })
     })
 
