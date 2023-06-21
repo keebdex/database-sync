@@ -1,7 +1,6 @@
 const { crc32 } = require('crc')
 const { format, parse } = require('date-fns')
-const { chunk, flatten, findLast } = require('lodash')
-const parse5 = require('parse5')
+const { chunk, flatten, findLast, get } = require('lodash')
 const { slugify, urlSlugify } = require('./slugify')
 
 const regRelease = /\(([a-zA-Z0-9 ]*\d{4})\)/gim
@@ -37,16 +36,14 @@ const normalize = (text) => {
 }
 
 const parseSculpt = (table, maker_id) => {
-    // table.tbody.tr.td
-    let [titleNodes, attrNodes] =
-        table.childNodes[0]?.childNodes[0]?.childNodes[0].childNodes
+    let [titleNodes, attrNodes] = table.table.tableRows[0].tableCells[0].content
 
-    let text = flatten(titleNodes.childNodes.map((cn) => cn.childNodes))
-        .map((s) => s.value)
+    let text = titleNodes.paragraph.elements
+        .map((s) => s.textRun.content.trim())
         .join('')
     let subtext = attrNodes
-        ? flatten(attrNodes.childNodes.map((cn) => cn.childNodes))
-              .map((s) => s.value)
+        ? attrNodes.paragraph.elements
+              .map((s) => s.textRun.content)
               .join('')
               .toLowerCase()
         : ''
@@ -96,31 +93,24 @@ const parseSculpt = (table, maker_id) => {
     return sculpt
 }
 
-const parser = (html, maker_id) => {
-    const document = parse5.parse(html)
-
-    const body = document.childNodes[0].childNodes.find(
-        (n) => n.nodeName === 'body'
-    )
-
-    let tables = body.childNodes.filter(
-        (n) => n.nodeName === 'table' && n.tagName === 'table'
-    )
+const parser = (jsonDoc, maker_id) => {
+    const tables = jsonDoc.data.body.content.filter((b) => b.table)
 
     const chunks = chunk(tables, 2)
     const sculpts = chunks.map((chunk) => {
-        if (chunk.length === 1) {
-            return null
-        }
+        if (chunk.length === 1) return null
 
         const sculpt = parseSculpt(chunk[0], maker_id)
 
-        const cells = flatten(
-            chunk[1].childNodes[0].childNodes.map((n) => n.childNodes)
-        )
-
         const colorways = []
+
+        const cells = flatten(chunk[1].table.tableRows.map((r) => r.tableCells))
+
         cells.forEach((cell, order) => {
+            const elements = flatten(
+                cell.content.map((c) => c.paragraph.elements)
+            )
+
             const colorway = {
                 name: '',
                 sculpt_id: sculpt.sculpt_id,
@@ -133,25 +123,23 @@ const parser = (html, maker_id) => {
             }
 
             const texts = []
+            elements.forEach((element) => {
+                if (element?.textRun?.content) {
+                    texts.push(element.textRun.content.trim())
+                }
 
-            // td.span
-            cell.childNodes.forEach((n) => {
-                const nodes = flatten(n.childNodes.map((cn) => cn.childNodes))
-                nodes.forEach((cn) => {
-                    switch (cn.nodeName) {
-                        case 'img':
-                            const attr = cn.attrs.find((a) => a.name === 'src')
-                            if (attr) {
-                                colorway.img = attr.value
-                            }
-                            break
-                        case '#text':
-                            texts.push(cn.value)
-                            break
-                        default:
-                            break
-                    }
-                })
+                if (element?.inlineObjectElement?.inlineObjectId) {
+                    const obj =
+                        jsonDoc.data.inlineObjects[
+                            element.inlineObjectElement.inlineObjectId
+                        ]
+                    const img = get(
+                        obj,
+                        'inlineObjectProperties.embeddedObject.imageProperties.contentUri'
+                    )
+
+                    colorway.img = img
+                }
             })
 
             let text = texts.join(' ')
@@ -235,7 +223,7 @@ const parser = (html, maker_id) => {
         return sculpt
     })
 
-    return sculpts.filter(s => s && s.name && s.colorways.length)
+    return sculpts.filter((s) => s && s.name && s.colorways.length)
 }
 
 module.exports = { parser }

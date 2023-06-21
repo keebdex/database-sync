@@ -12,7 +12,7 @@ getGDocMakers().then((makers) => {
         console.log('start downloading:', maker.id)
 
         downloader(maker.document_id)
-            .then((html) => parser(html, maker.id))
+            .then((jsonDoc) => parser(jsonDoc, maker.id))
             .then((data) => {
                 if (isDevelopment) {
                     writeFileSync(

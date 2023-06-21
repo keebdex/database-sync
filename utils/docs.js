@@ -1,16 +1,26 @@
-const { google } = require('googleapis')
+const docs = require('@googleapis/docs')
+const path = require('path')
 
 const downloader = async (documentId) => {
-    const drive = google.drive({
-        version: 'v3',
-        auth: process.env.GOOGLE_API_KEY,
-    })
-    const doc = await drive.files.export({
-        fileId: documentId,
-        mimeType: 'text/html',
+    const auth = new docs.auth.GoogleAuth({
+        keyFile: path.join(
+            __dirname,
+            '..',
+            '/keeb-catalogue-gserviceaccount.json'
+        ),
+        scopes: ['https://www.googleapis.com/auth/documents'],
     })
 
-    return doc.data
+    const authClient = await auth.getClient()
+
+    const client = docs.docs({
+        version: 'v1',
+        auth: authClient,
+    })
+
+    const doc = await client.documents.get({ documentId })
+
+    return doc
 }
 
 module.exports = { downloader }
