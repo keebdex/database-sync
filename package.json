@@ -18,13 +18,13 @@
   "homepage": "https://github.com/anhthang/keebtalogue-prometheus#readme",
   "dependencies": {
     "@googleapis/docs": "^2.0.1",
-    "@supabase/supabase-js": "^2.22.0",
+    "@supabase/supabase-js": "^2.26.0",
     "axios": "^1.4.0",
     "camaro": "^6.2.0",
     "crc": "^4.3.2",
     "date-fns": "^2.30.0",
-    "dotenv": "^16.0.3",
-    "ini": "^4.1.0",
+    "dotenv": "^16.3.1",
+    "ini": "^4.1.1",
     "lodash": "^4.17.21",
     "slugify": "^1.6.6",
     "xpath-html": "^1.0.3"

@@ -185,7 +185,7 @@ const parser = (jsonDoc, maker_id) => {
                     text = text
                         .replace('( * )', '')
                         .replace('*', '')
-                        .replace('  ', '')
+                        .replace('  ', ' ')
                 }
             }
 
