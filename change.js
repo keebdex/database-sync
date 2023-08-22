@@ -9,7 +9,7 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 )
 
-const [_node, _path, maker_id, sculpt_id, new_sculpt_id] = process.argv
+const [_node, _path, maker_id, sculpt_id, newname] = process.argv
 
 const getColorways = () =>
     supabase
@@ -31,9 +31,21 @@ getColorways().then((colorways) => {
             .from('colorways')
             .update(clw)
             .eq('id', clw.id)
-            .then(console.log('done', clw.name))
+            .then(console.log('colorways updated', clw.name))
             .catch((err) => {
                 console.error('err', clw.name)
             })
     })
+
+    supabase
+        .from('sculpts')
+        .update({
+            name: newname,
+            sculpt_id: slugify(newname, { lower: true }),
+        })
+        .eq('sculpt_id', sculpt_id)
+        .then(console.log('sculpt updated'))
+        .catch((err) => {
+            console.error('err')
+        })
 })
