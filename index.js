@@ -31,7 +31,7 @@ getGDocMakers().then((makers) => {
                     console.error(
                         'catalogue deleted or sth went wrong',
                         maker.id,
-                        err.message
+                        err.stack
                     )
                 })
         }, idx * 1000)

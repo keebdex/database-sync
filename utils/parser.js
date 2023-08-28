@@ -66,10 +66,17 @@ const parseSculpt = (table, maker_id) => {
     if (maker_id === 'jelly-key') {
         const dateMatch = jellyReg.exec(text)
         if (dateMatch) {
-            sculpt.release = format(
-                parse(dateMatch[1], 'yyyy/M/d', new Date()),
-                'dd MMM yyyy'
-            )
+            try {
+                sculpt.release = format(
+                    parse(dateMatch[1], 'yyyy/M/d', new Date()),
+                    'dd MMM yyyy'
+                )
+            } catch (error) {
+                sculpt.release = format(
+                    parse(dateMatch[1], 'yyyy/d/M', new Date()),
+                    'dd MMM yyyy'
+                )
+            }
             text = text.replace(jellyReg, '')
         }
     }
