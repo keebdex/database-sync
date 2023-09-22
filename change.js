@@ -19,6 +19,8 @@ const getColorways = () =>
         .eq('sculpt_id', sculpt_id)
 
 getColorways().then((colorways) => {
+    const new_sculpt_id = slugify(newname, { lower: true })
+
     colorways.data.forEach((clw) => {
         const slug = slugify(clw.name, { lower: true })
 
@@ -41,7 +43,7 @@ getColorways().then((colorways) => {
         .from('sculpts')
         .update({
             name: newname,
-            sculpt_id: slugify(newname, { lower: true }),
+            sculpt_id: new_sculpt_id,
         })
         .eq('sculpt_id', sculpt_id)
         .then(console.log('sculpt updated'))
