@@ -32,6 +32,9 @@ const normalize = (text) => {
         .replace('(ka_cover)', '')
         .replace(/(“|”)/g, '"')
         .replace(/(‘|’)/g, "'")
+        .replace(/\u200e/g, '') // cysm sculpt name
+        .replace(/\u200f/g, '') // cysm sculpt name
+        .replace(/\u200b/g, '') // cysm sculpt name
         .trim()
 }
 
