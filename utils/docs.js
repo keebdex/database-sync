@@ -1,7 +1,7 @@
 const docs = require('@googleapis/docs')
 const path = require('path')
 
-const downloader = async (documentId) => {
+const downloadDoc = async (documentId) => {
     const auth = new docs.auth.GoogleAuth({
         keyFile: path.join(
             __dirname,
@@ -23,4 +23,4 @@ const downloader = async (documentId) => {
     return doc
 }
 
-module.exports = { downloader }
+module.exports = { downloadDoc }

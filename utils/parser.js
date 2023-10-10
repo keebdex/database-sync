@@ -1,7 +1,6 @@
-const { crc32 } = require('crc')
 const { format, parse } = require('date-fns')
 const { chunk, flatten, findLast, get } = require('lodash')
-const { slugify, urlSlugify } = require('./slugify')
+const { urlSlugify } = require('./slugify')
 
 const regRelease = /\(([a-zA-Z0-9 ]*\d{4})\)/gim
 const jellyReg = /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim
@@ -148,7 +147,9 @@ const parser = (jsonDoc, maker_id) => {
                         'inlineObjectProperties.embeddedObject.imageProperties.contentUri'
                     )
 
-                    colorway.img = img
+                    colorway.remote_img = img
+                    colorway.colorway_id = obj.objectId
+                    colorway.img = `https://imagedelivery.net/${process.env.CF_ACCOUNT_HASH}/${obj.objectId}/public`
                 }
             })
 
@@ -214,12 +215,6 @@ const parser = (jsonDoc, maker_id) => {
             }
 
             colorway.name = normalize(text)
-
-            const slug = slugify(colorway.name)
-
-            colorway.colorway_id = crc32(
-                `${maker_id}-${sculpt.sculpt_id}-${slug}-${order}`
-            ).toString(16)
 
             colorways.push(colorway)
         })

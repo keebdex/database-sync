@@ -2,7 +2,8 @@ require('dotenv').config()
 
 const { writeFileSync } = require('fs')
 const { getGDocMakers, updateMaker } = require('./utils/database')
-const { downloader } = require('./utils/docs')
+const { downloadDoc } = require('./utils/docs')
+const { uploadImage } = require('./utils/image')
 const { parser } = require('./utils/parser')
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -12,7 +13,7 @@ getGDocMakers().then((makers) => {
         setTimeout(() => {
             console.log('start downloading:', maker.id)
 
-            downloader(maker.document_id)
+            downloadDoc(maker.document_id)
                 .then((jsonDoc) => parser(jsonDoc, maker.id))
                 .then((data) => {
                     if (isDevelopment) {
@@ -23,6 +24,12 @@ getGDocMakers().then((makers) => {
                                 console.log('done', maker.id)
                             }
                         )
+
+                        data.forEach((sculpt) => {
+                            sculpt.colorways.map(async (clw) => {
+                                await uploadImage(clw.remote_img, clw.object_id)
+                            })
+                        })
                     }
 
                     updateMaker(maker.id, data)
