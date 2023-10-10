@@ -218,4 +218,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,linux,windows
 
 db/
+existed_images.json
 keeb-catalogue-gserviceaccount.json
