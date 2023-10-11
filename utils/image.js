@@ -43,17 +43,14 @@ async function uploadImage(filename, url) {
             // console.log(JSON.stringify(response.data))
         })
         .catch(({ response, message }) => {
-            const { status, data } = response
-            if ([409, 429].includes(status)) {
-                // do nothing
-            } else {
-                console.error(
-                    'unable to upload image',
-                    filename,
-                    message,
-                    JSON.stringify(data)
-                )
-            }
+            const { data } = response
+
+            console.error(
+                'unable to upload image',
+                filename,
+                message,
+                JSON.stringify(data)
+            )
         })
 }
 

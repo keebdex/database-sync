@@ -30,17 +30,20 @@ async function scan(maker) {
             const images = []
             data.forEach((sculpt) => {
                 sculpt.colorways.map(async (clw) => {
-                    if (!existed.includes(clw.colorway_id)) {
-                        images.push([clw.colorway_id, clw.remote_img])
+                    const filename = `${clw.maker_id}-${clw.sculpt_id}-${clw.colorway_id}`
+                    if (!existed.includes(filename)) {
+                        images.push([filename, clw.remote_img])
                     }
                 })
             })
 
             if (images.length) {
+                console.log('updating', images.length)
+
                 await updateMaker(maker.id, data)
 
                 await Promise.map(images, (img) => uploadImage(...img), {
-                    concurrency: 10,
+                    concurrency: 5,
                 })
             }
         })

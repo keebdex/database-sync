@@ -149,7 +149,7 @@ const parser = (jsonDoc, maker_id) => {
 
                     colorway.remote_img = img
                     colorway.colorway_id = obj.objectId
-                    colorway.img = `https://imagedelivery.net/${process.env.CF_ACCOUNT_HASH}/${obj.objectId}/public`
+                    colorway.img = `https://imagedelivery.net/${process.env.CF_ACCOUNT_HASH}/${maker_id}-${sculpt.sculpt_id}-${obj.objectId}/public`
                 }
             })
 
