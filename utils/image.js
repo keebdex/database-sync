@@ -80,4 +80,18 @@ async function getListImages(images = [], token) {
     })
 }
 
-module.exports = { downloadImage, uploadImage, getListImages }
+async function deleteImage(imageId) {
+    const config = {
+        method: 'delete',
+        url: `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_IMAGES_ACCOUNT_ID}/images/v1/${imageId}`,
+        headers: {
+            Authorization: `Bearer ${process.env.CF_IMAGES_API_KEY}`,
+        },
+    }
+
+    return axios(config).catch(({ message }) => {
+        console.error('unable to delete image', imageId, message)
+    })
+}
+
+module.exports = { downloadImage, uploadImage, getListImages, deleteImage }

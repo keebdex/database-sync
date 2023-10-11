@@ -93,4 +93,29 @@ const getColorways = async (maker_id, rows = []) => {
     return rows
 }
 
-module.exports = { getGDocMakers, updateMaker, getColorways }
+const insertColorways = async (colorways) => {
+    const { data, error } = await supabase.from('colorways').insert(colorways)
+
+    if (error) {
+        console.warn('insert new colorways error', error)
+    }
+}
+
+const updateColorway = async (id, colorway) => {
+    const { data, error } = await supabase
+        .from('colorways')
+        .update(colorway)
+        .eq('id', id)
+
+    if (error) {
+        console.warn('update new colorway error', id, error)
+    }
+}
+
+module.exports = {
+    getGDocMakers,
+    updateMaker,
+    getColorways,
+    insertColorways,
+    updateColorway,
+}
