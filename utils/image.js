@@ -31,9 +31,9 @@ async function uploadImage(filename, url) {
     let config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/images/v1`,
+        url: `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_IMAGES_ACCOUNT_ID}/images/v1`,
         headers: {
-            Authorization: `Bearer ${process.env.CF_IMAGE_TOKEN}`,
+            Authorization: `Bearer ${process.env.CF_IMAGES_API_KEY}`,
         },
         data,
     }
@@ -57,11 +57,12 @@ async function uploadImage(filename, url) {
 async function getListImages(images = [], token) {
     const config = {
         method: 'get',
-        url: `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/images/v2`,
+        url: `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_IMAGES_ACCOUNT_ID}/images/v2`,
         headers: {
-            Authorization: `Bearer ${process.env.CF_IMAGE_TOKEN}`,
+            Authorization: `Bearer ${process.env.CF_IMAGES_API_KEY}`,
         },
         params: {
+            per_page: 5000,
             continuation_token: token,
         },
     }

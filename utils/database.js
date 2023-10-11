@@ -76,4 +76,21 @@ const updateMaker = async (maker_id, data) => {
     )
 }
 
-module.exports = { getGDocMakers, updateMaker }
+const getColorways = async (maker_id, rows = []) => {
+    const { data } = await supabase
+        .from('colorways')
+        .select()
+        .eq('maker_id', maker_id)
+        .order('id')
+        .range(rows.length, rows.length + 999)
+
+    rows = rows.concat(data)
+
+    if (data.length === 1000) {
+        return getColorways(maker_id, rows)
+    }
+
+    return rows
+}
+
+module.exports = { getGDocMakers, updateMaker, getColorways }
