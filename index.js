@@ -4,14 +4,17 @@ const Promise = require('bluebird')
 const { writeFileSync } = require('fs')
 const { flatten, difference, map, keyBy, isEmpty } = require('lodash')
 const {
-    getGDocMakers,
     getColorways,
+    getGDocMakers,
     insertColorways,
     updateColorway,
+    upsert,
 } = require('./utils/database')
 const { downloadDoc } = require('./utils/docs')
 const { uploadImage, getListImages, deleteImage } = require('./utils/image')
 const { parser } = require('./utils/parser')
+
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const clwKey = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
 const orderKey = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
@@ -21,14 +24,21 @@ let existedImages = []
 async function syncDatabase(gdocData) {
     const { maker_id } = gdocData[0]
 
-    writeFileSync(
-        `db/${maker_id}.json`,
-        JSON.stringify(gdocData, null, 2),
-        () => {
-            console.log('done')
-        }
-    )
+    if (isDevelopment) {
+        writeFileSync(
+            `db/${maker_id}.json`,
+            JSON.stringify(gdocData, null, 2),
+            () => {
+                console.log('done')
+            }
+        )
+    }
 
+    // update sculpts
+    const sculpts = gdocData.map(({ colorways, ...rest }) => rest)
+    upsert('sculpts', sculpts)
+
+    // update colorways
     const colorways = flatten(map(gdocData, 'colorways'))
 
     const storedColorways = await getColorways(maker_id)

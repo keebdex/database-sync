@@ -113,9 +113,10 @@ const updateColorway = async (id, colorway) => {
 }
 
 module.exports = {
-    getGDocMakers,
-    updateMaker,
     getColorways,
+    getGDocMakers,
     insertColorways,
     updateColorway,
+    updateMaker,
+    upsert,
 }
