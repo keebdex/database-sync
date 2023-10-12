@@ -16,7 +16,7 @@ const { parser } = require('./utils/parser')
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-const clwKey = (c) => {
+const makeColorwayKey = (c) => {
     return [
         c.maker_id,
         c.sculpt_id,
@@ -29,8 +29,8 @@ const clwKey = (c) => {
     ].join()
 }
 
-const imageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
-const orderKey = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
+const makeImageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
+const makeKeyByOrder = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
 
 let existedImages = []
 
@@ -53,41 +53,45 @@ async function syncDatabase(gdocData) {
 
     // update colorways
     const colorways = flatten(map(gdocData, 'colorways'))
-
     const storedColorways = await getColorways(maker_id)
 
-    const incomingKeys = colorways.map(clwKey)
-    const existedKeys = storedColorways.map(clwKey)
+    const incomingKeys = colorways.map(makeColorwayKey)
+    const existedKeys = storedColorways.map(makeColorwayKey)
 
     const newKeys = difference(incomingKeys, existedKeys)
     const changedKeys = difference(existedKeys, incomingKeys)
 
-    const tobeInserted = colorways.filter((c) => newKeys.includes(clwKey(c)))
+    const tobeInserted = colorways.filter((c) =>
+        newKeys.includes(makeColorwayKey(c))
+    )
     const tobeUpdated = storedColorways.filter((c) =>
-        changedKeys.includes(clwKey(c))
+        changedKeys.includes(makeColorwayKey(c))
     )
 
-    const insertingMap = keyBy(tobeInserted, orderKey)
+    const insertingMap = keyBy(tobeInserted, makeKeyByOrder)
 
     const deleteClws = []
     const updateClw = {}
 
     tobeUpdated.forEach((c) => {
-        const key = orderKey(c)
+        const key = makeKeyByOrder(c)
         if (insertingMap[key]) {
-            updateClw[c.id] = insertingMap[key]
+            const { remote_img, ...rest } = insertingMap[key]
+            updateClw[c.id] = rest
 
-            if (c.colorway_id !== insertingMap[key].colorway_id) {
-                deleteClws.push(imageId(c))
+            if (c.colorway_id !== rest.colorway_id) {
+                deleteClws.push(makeImageId(c))
             }
 
             delete insertingMap[key]
         } else {
-            deleteClws.push(imageId(c))
+            deleteClws.push(makeImageId(c))
         }
     })
 
-    const insertClws = Object.values(insertingMap)
+    const insertClws = Object.values(insertingMap).map(
+        ({ remote_img, ...rest }) => rest
+    )
 
     if (insertClws.length) {
         await insertColorways(insertClws)
