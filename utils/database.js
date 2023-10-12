@@ -1,11 +1,32 @@
 require('dotenv').config()
 
 const { createClient } = require('@supabase/supabase-js')
+const { writeFileSync } = require('fs')
+const { flatten, difference, map, keyBy, isEmpty } = require('lodash')
+const { deleteImage } = require('./image')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_KEY
 )
+
+const isDevelopment = process.env.NODE_ENV !== 'production'
+
+const makeColorwayKey = (c) => {
+    return [
+        c.maker_id,
+        c.sculpt_id,
+        c.colorway_id,
+        c.name,
+        c.giveaway,
+        c.commissioned,
+        c.release,
+        c.qty,
+    ].join()
+}
+
+const makeImageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
+const makeKeyByOrder = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
 
 const upsert = async (table, data) => {
     const { error } = await supabase.from(table).upsert(data)
@@ -28,53 +49,6 @@ const getGDocMakers = () =>
                 }
             })
         )
-
-const updateMaker = async (maker_id, data) => {
-    let colors = []
-    const sculpts = data.map(({ colorways, ...rest }) => {
-        colors = colors.concat(colorways)
-        return rest
-    })
-
-    /**
-     * FIXME: need to find a better solution
-     * with this fix, the crawler will not override the manual input data if empty
-     * it might be wrong if the catalog maintainer input/remove wrong data
-     */
-    const releaseOnly = colors
-        .filter((c) => c.release && !c.qty)
-        .map(({ qty, ...rest }) => rest)
-    const qtyOnly = colors
-        .filter((c) => !c.release && c.qty)
-        .map(({ release, ...rest }) => rest)
-    const hasNoExtra = colors
-        .filter((c) => !c.release && !c.qty)
-        .map(({ release, qty, ...rest }) => rest)
-    const hasExtra = colors.filter((c) => c.release && c.qty)
-
-    await upsert('sculpts', sculpts)
-    if (releaseOnly.length) {
-        await upsert('colorways', releaseOnly)
-    }
-    if (qtyOnly.length) {
-        await upsert('colorways', qtyOnly)
-    }
-    if (hasNoExtra.length) {
-        await upsert('colorways', hasNoExtra)
-    }
-    if (hasExtra.length) {
-        await upsert('colorways', hasExtra)
-    }
-
-    console.log(
-        'inserted/updated',
-        maker_id,
-        'sculpts',
-        sculpts.length,
-        'colorways',
-        colors.length
-    )
-}
 
 const getColorways = async (maker_id, rows = []) => {
     const { data } = await supabase
@@ -112,11 +86,91 @@ const updateColorway = async (id, colorway) => {
     }
 }
 
+const updateMakerDatabase = async (gdocData) => {
+    const { maker_id } = gdocData[0]
+
+    if (isDevelopment) {
+        writeFileSync(
+            `db/${maker_id}.json`,
+            JSON.stringify(gdocData, null, 2),
+            () => {
+                console.log('done')
+            }
+        )
+    }
+
+    // update sculpts
+    const sculpts = gdocData.map(({ colorways, ...rest }) => rest)
+    upsert('sculpts', sculpts)
+
+    // update colorways
+    const colorways = flatten(map(gdocData, 'colorways'))
+    const storedColorways = await getColorways(maker_id)
+
+    const incomingKeys = colorways.map(makeColorwayKey)
+    const existedKeys = storedColorways.map(makeColorwayKey)
+
+    const newKeys = difference(incomingKeys, existedKeys)
+    const changedKeys = difference(existedKeys, incomingKeys)
+
+    const tobeInserted = colorways.filter((c) =>
+        newKeys.includes(makeColorwayKey(c))
+    )
+    const tobeUpdated = storedColorways.filter((c) =>
+        changedKeys.includes(makeColorwayKey(c))
+    )
+
+    const insertingMap = keyBy(tobeInserted, makeKeyByOrder)
+
+    const deleteClws = []
+    const updateClw = {}
+
+    tobeUpdated.forEach((c) => {
+        const key = makeKeyByOrder(c)
+        if (insertingMap[key]) {
+            const { remote_img, ...rest } = insertingMap[key]
+            updateClw[c.id] = rest
+
+            if (c.colorway_id !== rest.colorway_id) {
+                deleteClws.push(makeImageId(c))
+            }
+
+            delete insertingMap[key]
+        } else {
+            deleteClws.push(makeImageId(c))
+        }
+    })
+
+    const insertClws = Object.values(insertingMap).map(
+        ({ remote_img, ...rest }) => rest
+    )
+
+    if (insertClws.length) {
+        await insertColorways(insertClws)
+        console.log('inserted', insertClws.length)
+    }
+
+    if (!isEmpty(updateClw)) {
+        await Promise.map(
+            Object.entries(updateClw),
+            ([id, data]) => updateColorway(id, data),
+            { concurrency: 1 }
+        )
+
+        console.log('updated', Object.entries(updateClw).length)
+    }
+
+    if (deleteClws.length) {
+        await Promise.map(deleteClws, deleteImage, { concurrency: 10 })
+
+        console.log('deleted images', deleteClws.length)
+    }
+
+    return colorways
+}
+
 module.exports = {
-    getColorways,
     getGDocMakers,
-    insertColorways,
-    updateColorway,
-    updateMaker,
-    upsert,
+    makeImageId,
+    updateMakerDatabase,
 }

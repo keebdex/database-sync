@@ -2,7 +2,7 @@ const axios = require('axios')
 const { crc32 } = require('crc')
 const { writeFileSync } = require('fs')
 const { findLast } = require('lodash')
-const { updateMaker } = require('../utils/database')
+const { updateMakerDatabase } = require('../utils/database')
 const { slugify, urlSlugify } = require('../utils/slugify')
 
 const maker_id = 'gooey-keys'
@@ -25,6 +25,8 @@ const downloader = async () => {
                 maker_id,
                 sculpt_id,
                 release,
+                giveaway: false,
+                commissioned: false,
                 colorway_id: crc32(
                     `${maker_id}-${sculpt_id}-${slugify(name)}`
                 ).toString(16),
@@ -46,7 +48,7 @@ const downloader = async () => {
         writeFileSync(`db/${maker_id}.json`, JSON.stringify(sculpts, null, 2))
     }
 
-    updateMaker(maker_id, sculpts)
+    updateMakerDatabase(sculpts)
 }
 
 downloader()

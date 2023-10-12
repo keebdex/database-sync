@@ -3,7 +3,7 @@ const { writeFileSync } = require('fs')
 const axios = require('axios')
 const xpath = require('xpath-html')
 const { findLast } = require('lodash')
-const { updateMaker } = require('../utils/database')
+const { updateMakerDatabase } = require('../utils/database')
 const { slugify } = require('../utils/slugify')
 
 const baseUrl = 'https://alphakeycaps.com'
@@ -31,6 +31,8 @@ const sculptScraper = async (sculpt_id, sculpt_name) => {
             img,
             maker_id,
             sculpt_id,
+            giveaway: false,
+            commissioned: false,
             colorway_id: crc32(
                 `${maker_id}-${sculpt_id}-${slugify(name)}`
             ).toString(16),
@@ -54,7 +56,7 @@ const catalogs = [
     'Boosted Gamer Set',
     'Geekpora',
     'Prayge',
-    'Devoura'
+    'Devoura',
 ]
 
 const downloader = async () => {
@@ -76,7 +78,7 @@ const downloader = async () => {
         writeFileSync(`db/${maker_id}.json`, JSON.stringify(sculpts, null, 2))
     }
 
-    updateMaker(maker_id, sculpts)
+    updateMakerDatabase(sculpts)
 }
 
 downloader()
