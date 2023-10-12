@@ -16,7 +16,20 @@ const { parser } = require('./utils/parser')
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-const clwKey = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
+const clwKey = (c) => {
+    return [
+        c.maker_id,
+        c.sculpt_id,
+        c.colorway_id,
+        c.name,
+        c.giveaway,
+        c.commissioned,
+        c.release,
+        c.qty,
+    ].join()
+}
+
+const imageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
 const orderKey = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
 
 let existedImages = []
@@ -64,10 +77,14 @@ async function syncDatabase(gdocData) {
         if (insertingMap[key]) {
             updateClw[c.id] = insertingMap[key]
 
-            delete insertingMap[key]
-        }
+            if (c.colorway_id !== insertingMap[key].colorway_id) {
+                deleteClws.push(imageId(c))
+            }
 
-        deleteClws.push(clwKey(c))
+            delete insertingMap[key]
+        } else {
+            deleteClws.push(imageId(c))
+        }
     })
 
     const insertClws = Object.values(insertingMap)
@@ -92,12 +109,6 @@ async function syncDatabase(gdocData) {
 
         console.log('deleted images', deleteClws.length)
     }
-
-    /**
-     * FIXME
-     * How we can update extra data like: release, qty
-     * How we can prune changed/removed images
-     */
 
     return colorways
 }
