@@ -77,6 +77,17 @@ const insertColorways = async (colorways) => {
     }
 }
 
+const deleteColorways = async (ids) => {
+    const { data, error } = await supabase
+        .from('colorways')
+        .delete()
+        .in('id', ids)
+
+    if (error) {
+        console.warn('insert new colorways error', error)
+    }
+}
+
 const updateColorway = async (id, colorway) => {
     const { data, error } = await supabase
         .from('colorways')
@@ -124,8 +135,9 @@ const updateMakerDatabase = async (gdocData) => {
 
     const insertingMap = keyBy(tobeInserted, makeKeyByOrder)
 
-    const deleteClws = []
+    const outdatedImages = []
     const updateClw = {}
+    const deletedRows = []
 
     tobeUpdated.forEach((c) => {
         const key = makeKeyByOrder(c)
@@ -134,12 +146,14 @@ const updateMakerDatabase = async (gdocData) => {
             updateClw[c.id] = rest
 
             if (c.colorway_id !== rest.colorway_id) {
-                deleteClws.push(makeImageId(c))
+                outdatedImages.push(makeImageId(c))
             }
 
             delete insertingMap[key]
         } else {
-            deleteClws.push(makeImageId(c))
+            // colorway deleted, to be removed from the database
+            outdatedImages.push(makeImageId(c))
+            deletedRows.push(c.id)
         }
     })
 
@@ -149,6 +163,7 @@ const updateMakerDatabase = async (gdocData) => {
 
     if (insertClws.length) {
         await insertColorways(insertClws)
+
         console.log('inserted', insertClws.length)
     }
 
@@ -162,10 +177,16 @@ const updateMakerDatabase = async (gdocData) => {
         console.log('updated', Object.entries(updateClw).length)
     }
 
-    if (deleteClws.length) {
-        await Promise.map(deleteClws, deleteImage, { concurrency: 10 })
+    if (outdatedImages.length) {
+        await Promise.map(outdatedImages, deleteImage, { concurrency: 10 })
 
-        console.log('deleted images', deleteClws.length)
+        console.log('images pruned', outdatedImages.length)
+    }
+
+    if (deletedRows.length) {
+        await deleteColorways(deletedRows)
+
+        console.log('deleted', outdatedImages.length)
     }
 
     return colorways

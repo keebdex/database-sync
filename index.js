@@ -1,7 +1,11 @@
 require('dotenv').config()
 
 const Promise = require('bluebird')
-const { getGDocMakers, makeImageId, updateMakerDatabase } = require('./utils/database')
+const {
+    getGDocMakers,
+    makeImageId,
+    updateMakerDatabase,
+} = require('./utils/database')
 const { downloadDoc } = require('./utils/docs')
 const { uploadImage, getListImages } = require('./utils/image')
 const { parser } = require('./utils/parser')
