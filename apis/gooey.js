@@ -3,7 +3,7 @@ const { crc32 } = require('crc')
 const { writeFileSync } = require('fs')
 const { findLast } = require('lodash')
 const { updateMakerDatabase } = require('../utils/database')
-const { slugify, urlSlugify } = require('../utils/slugify')
+const { urlSlugify } = require('../utils/slugify')
 
 const maker_id = 'gooey-keys'
 
@@ -28,7 +28,7 @@ const downloader = async () => {
                 giveaway: false,
                 commissioned: false,
                 colorway_id: crc32(
-                    `${maker_id}-${sculpt_id}-${slugify(name)}`
+                    `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
                 ).toString(16),
                 order,
             }

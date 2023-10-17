@@ -1,8 +1,7 @@
 require('dotenv').config()
 
 const { createClient } = require('@supabase/supabase-js')
-const { crc32 } = require('crc')
-const { default: slugify } = require('slugify')
+const { urlSlugify } = require('./utils/slugify')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -10,44 +9,33 @@ const supabase = createClient(
 )
 
 const [_node, _path, maker_id, sculpt_id, newname] = process.argv
+const new_sculpt_id = urlSlugify(newname, { lower: true })
 
-const getColorways = () =>
-    supabase
+async function changeSculptName() {
+    await supabase
         .from('colorways')
-        .select()
+        .update({
+            sculpt_id: new_sculpt_id,
+        })
+        .eq('sculpt_id', new_sculpt_id)
         .eq('maker_id', maker_id)
-        .eq('sculpt_id', sculpt_id)
+        .then(console.log('colorways updated'))
+        .catch((err) => {
+            console.error('err', err.message)
+        })
 
-getColorways().then((colorways) => {
-    const new_sculpt_id = slugify(newname, { lower: true })
-
-    colorways.data.forEach((clw) => {
-        const slug = slugify(clw.name, { lower: true })
-
-        clw.sculpt_id = new_sculpt_id
-        clw.colorway_id = crc32(
-            `${maker_id}-${new_sculpt_id}-${slug}-${clw.order}`
-        ).toString(16)
-
-        supabase
-            .from('colorways')
-            .update(clw)
-            .eq('id', clw.id)
-            .then(console.log('colorways updated', clw.name))
-            .catch((err) => {
-                console.error('err', clw.name)
-            })
-    })
-
-    supabase
+    await supabase
         .from('sculpts')
         .update({
             name: newname,
             sculpt_id: new_sculpt_id,
         })
         .eq('sculpt_id', sculpt_id)
+        .eq('maker_id', maker_id)
         .then(console.log('sculpt updated'))
         .catch((err) => {
-            console.error('err')
+            console.error('err', err.message)
         })
-})
+}
+
+changeSculptName()

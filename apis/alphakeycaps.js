@@ -4,7 +4,7 @@ const axios = require('axios')
 const xpath = require('xpath-html')
 const { findLast } = require('lodash')
 const { updateMakerDatabase } = require('../utils/database')
-const { slugify } = require('../utils/slugify')
+const { urlSlugify } = require('../utils/slugify')
 
 const baseUrl = 'https://alphakeycaps.com'
 const maker_id = 'alpha-keycaps'
@@ -34,7 +34,7 @@ const sculptScraper = async (sculpt_id, sculpt_name) => {
             giveaway: false,
             commissioned: false,
             colorway_id: crc32(
-                `${maker_id}-${sculpt_id}-${slugify(name)}`
+                `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
             ).toString(16),
             order,
         }
@@ -62,7 +62,7 @@ const catalogs = [
 const downloader = async () => {
     const sculpts = await Promise.all(
         catalogs.map(async (name) => {
-            const sculpt_id = slugify(name)
+            const sculpt_id = urlSlugify(name)
             const colorways = await sculptScraper(sculpt_id, name)
             return {
                 name,
