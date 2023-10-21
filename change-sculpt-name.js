@@ -17,7 +17,7 @@ async function changeSculptName() {
         .update({
             sculpt_id: new_sculpt_id,
         })
-        .eq('sculpt_id', new_sculpt_id)
+        .eq('sculpt_id', sculpt_id)
         .eq('maker_id', maker_id)
         .then(console.log('colorways updated'))
         .catch((err) => {
