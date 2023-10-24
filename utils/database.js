@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const { createClient } = require('@supabase/supabase-js')
 const Promise = require('bluebird')
 const { writeFileSync } = require('fs')
@@ -70,7 +68,7 @@ const getColorways = async (maker_id, rows = []) => {
 }
 
 const insertColorways = async (colorways) => {
-    const { data, error } = await supabase.from('colorways').insert(colorways)
+    const { error } = await supabase.from('colorways').insert(colorways)
 
     if (error) {
         console.warn('insert new colorways error', error)
@@ -78,10 +76,7 @@ const insertColorways = async (colorways) => {
 }
 
 const deleteColorways = async (ids) => {
-    const { data, error } = await supabase
-        .from('colorways')
-        .delete()
-        .in('id', ids)
+    const { error } = await supabase.from('colorways').delete().in('id', ids)
 
     if (error) {
         console.warn('insert new colorways error', error)
@@ -89,7 +84,7 @@ const deleteColorways = async (ids) => {
 }
 
 const updateColorway = async (id, colorway) => {
-    const { data, error } = await supabase
+    const { error } = await supabase
         .from('colorways')
         .update(colorway)
         .eq('id', id)
@@ -99,13 +94,13 @@ const updateColorway = async (id, colorway) => {
     }
 }
 
-const updateMakerDatabase = async (gdocData) => {
-    const { maker_id } = gdocData[0]
+const updateMakerDatabase = async (tables) => {
+    const { maker_id } = tables[0]
 
     if (isDevelopment) {
         writeFileSync(
             `db/${maker_id}.json`,
-            JSON.stringify(gdocData, null, 2),
+            JSON.stringify(tables, null, 2),
             () => {
                 console.log('done')
             }
@@ -113,11 +108,11 @@ const updateMakerDatabase = async (gdocData) => {
     }
 
     // update sculpts
-    const sculpts = gdocData.map(({ colorways, ...rest }) => rest)
+    const sculpts = tables.map(({ colorways, ...rest }) => rest)
     upsert('sculpts', sculpts)
 
     // update colorways
-    const colorways = flatten(map(gdocData, 'colorways'))
+    const colorways = flatten(map(tables, 'colorways'))
     const storedColorways = await getColorways(maker_id)
 
     const incomingKeys = colorways.map(makeColorwayKey)
@@ -161,13 +156,18 @@ const updateMakerDatabase = async (gdocData) => {
         ({ remote_img, ...rest }) => rest
     )
 
+    let sync = false
+
     if (insertClws.length) {
+        sync = true
         await insertColorways(insertClws)
 
         console.log('inserted', insertClws.length)
     }
 
     if (!isEmpty(updateClw)) {
+        sync = true
+
         await Promise.map(
             Object.entries(updateClw),
             ([id, data]) => updateColorway(id, data),
@@ -189,7 +189,7 @@ const updateMakerDatabase = async (gdocData) => {
         console.log('deleted', outdatedImages.length)
     }
 
-    return colorways
+    return { sync, colorways }
 }
 
 module.exports = {

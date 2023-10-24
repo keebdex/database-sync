@@ -1,13 +1,11 @@
 const axios = require('axios')
 const { crc32 } = require('crc')
-const { writeFileSync } = require('fs')
 const { findLast } = require('lodash')
-const { updateMakerDatabase } = require('../utils/database')
 const { urlSlugify } = require('../utils/slugify')
 
 const maker_id = 'gooey-keys'
 
-const downloader = async () => {
+const scraper = async () => {
     const { data } = await axios({
         method: 'get',
         url: 'https://gooey.link/keycap-archivist.json',
@@ -44,11 +42,7 @@ const downloader = async () => {
         }
     })
 
-    if (process.env.NODE_ENV !== 'production') {
-        writeFileSync(`db/${maker_id}.json`, JSON.stringify(sculpts, null, 2))
-    }
-
-    updateMakerDatabase(sculpts)
+    return sculpts
 }
 
-downloader()
+module.exports = { scraper }

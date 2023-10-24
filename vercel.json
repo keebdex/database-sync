@@ -1,0 +1,12 @@
+{
+    "crons": [
+        {
+            "path": "/google",
+            "schedule": "0 0 * * *"
+        },
+        {
+            "path": "/import",
+            "schedule": "0 0 * * *"
+        }
+    ]
+}

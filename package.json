@@ -1,5 +1,5 @@
 {
-  "name": "keebtalogue-prometheus",
+  "name": "keebtalogue-agent",
   "version": "1.0.0",
   "description": "scraper tools for keebtalogue",
   "main": "index.js",
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/anhthang/keebtalogue-prometheus#readme",
   "dependencies": {
     "@googleapis/docs": "^3.0.0",
-    "@supabase/supabase-js": "^2.38.1",
+    "@supabase/supabase-js": "^2.38.2",
     "axios": "^1.5.1",
     "bluebird": "^3.7.2",
     "camaro": "^6.2.1",

@@ -1,9 +1,7 @@
 const { crc32 } = require('crc')
-const { writeFileSync } = require('fs')
 const axios = require('axios')
 const xpath = require('xpath-html')
 const { findLast } = require('lodash')
-const { updateMakerDatabase } = require('../utils/database')
 const { urlSlugify } = require('../utils/slugify')
 
 const baseUrl = 'https://alphakeycaps.com'
@@ -59,7 +57,7 @@ const catalogs = [
     'Devoura',
 ]
 
-const downloader = async () => {
+const scraper = async () => {
     const sculpts = await Promise.all(
         catalogs.map(async (name) => {
             const sculpt_id = urlSlugify(name)
@@ -74,11 +72,7 @@ const downloader = async () => {
         })
     )
 
-    if (process.env.NODE_ENV !== 'production') {
-        writeFileSync(`db/${maker_id}.json`, JSON.stringify(sculpts, null, 2))
-    }
-
-    updateMakerDatabase(sculpts)
+    return sculpts
 }
 
-downloader()
+module.exports = { scraper }

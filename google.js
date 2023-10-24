@@ -12,7 +12,10 @@ const { parser } = require('./utils/parser')
 
 let existedImages = []
 
-async function syncImages(colorways) {
+async function syncImages({ sync = false, colorways }) {
+    // prevent syncing images for staled makers
+    if (!sync) return
+
     const images = []
     colorways.map((clw) => {
         const filename = makeImageId(clw)

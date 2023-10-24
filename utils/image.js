@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const { default: axios } = require('axios')
 const fs = require('fs')
 const FormData = require('form-data')

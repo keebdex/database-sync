@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 const { createClient } = require('@supabase/supabase-js')
-const { urlSlugify } = require('./utils/slugify')
+const { urlSlugify } = require('../utils/slugify')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
