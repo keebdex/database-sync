@@ -7,7 +7,7 @@ const { updateMakerDatabase } = require('./utils/database')
 
 function scan(filename) {
     console.log('scanning', filename)
-    const { scraper } = require(`./importers/${filename}`)
+    const { scraper } = require(`./self-hosted/${filename}`)
 
     return scraper().then(updateMakerDatabase)
 }

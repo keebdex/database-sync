@@ -11,6 +11,9 @@ const supabase = createClient(
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
+const sculptTable = 'sculpts'
+const colorwayTable = 'colorways'
+
 const makeColorwayKey = (c) => {
     return [
         c.maker_id,
@@ -25,15 +28,21 @@ const makeColorwayKey = (c) => {
     ].join()
 }
 
+const makeSculptKey = (s) => {
+    return [
+        s.maker_id,
+        s.sculpt_id,
+        s.release,
+        s.profile,
+        s.cast,
+        s.design,
+    ].join()
+}
+
 const makeImageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
 const makeKeyByOrder = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
 
-const upsert = async (table, data) => {
-    const { error } = await supabase.from(table).upsert(data)
-    if (error) {
-        console.warn(`update table '${table}' error`, data[0].maker_id, error)
-    }
-}
+const makeSculptId = (s) => `${s.maker_id}-${s.sculpt_id}`
 
 const getGDocMakers = () =>
     supabase
@@ -41,6 +50,7 @@ const getGDocMakers = () =>
         .select()
         .like('src', '%docs.google.com%')
         .neq('deleted', true)
+        .in('id', ['mubai'])
         .then(({ data }) =>
             data.map((m) => {
                 return {
@@ -67,30 +77,92 @@ const getColorways = async (maker_id, rows = []) => {
     return rows
 }
 
-const insertColorways = async (colorways) => {
-    const { error } = await supabase.from('colorways').insert(colorways)
+const insertRows = async (table, values) => {
+    const { error } = await supabase.from(table).insert(values)
 
     if (error) {
-        console.warn('insert new colorways error', error)
+        console.warn(`insert new ${table} error`, error)
     }
 }
 
-const deleteColorways = async (ids) => {
-    const { error } = await supabase.from('colorways').delete().in('id', ids)
+const deleteRows = async (table, ids) => {
+    const { error } = await supabase.from(table).delete().in('id', ids)
 
     if (error) {
-        console.warn('insert new colorways error', error)
+        console.warn(`delete old ${table} error`, error)
     }
 }
 
-const updateColorway = async (id, colorway) => {
-    const { error } = await supabase
-        .from('colorways')
-        .update(colorway)
-        .eq('id', id)
+const updateRow = async (table, id, values) => {
+    const { error } = await supabase.from(table).update(values).eq('id', id)
 
     if (error) {
-        console.warn('update new colorway error', id, error)
+        console.warn(`update ${table} row error`, id, error)
+    }
+}
+
+const updateSculpts = async (sculpts) => {
+    const { data: storedSculpts } = await supabase
+        .from('sculpts')
+        .select()
+        .eq('maker_id', sculpts[0].maker_id)
+
+    const incomingKeys = sculpts.map(makeSculptKey)
+    const existedKeys = storedSculpts.map(makeSculptKey)
+
+    const newKeys = difference(incomingKeys, existedKeys)
+    const changedKeys = difference(existedKeys, incomingKeys)
+
+    const tobeInserted = sculpts.filter((s) =>
+        newKeys.includes(makeSculptKey(s))
+    )
+    const tobeUpdated = storedSculpts.filter((s) =>
+        changedKeys.includes(makeSculptKey(s))
+    )
+
+    const insertingMap = keyBy(tobeInserted, makeSculptId)
+
+    const updateSculpt = {}
+    const deletedSculpts = []
+
+    /**
+     * we dont know it's newly added sculpt or just sculpt name is changed
+     * so we accept that and remove old ones
+     */
+    tobeUpdated.forEach((s) => {
+        const key = makeSculptId(s)
+        if (insertingMap[key]) {
+            updateSculpt[s.id] = insertingMap[key]
+
+            delete insertingMap[key]
+        } else {
+            deletedSculpts.push(s.id)
+        }
+    })
+
+    const newSculpts = Object.values(insertingMap)
+
+    if (newSculpts.length) {
+        await insertRows(sculptTable, newSculpts)
+
+        console.log('inserted', newSculpts.length)
+    }
+
+    if (!isEmpty(updateSculpt)) {
+        await Promise.map(
+            Object.entries(updateSculpt),
+            ([id, data]) => updateRow(sculptTable, id, data),
+            { concurrency: 1 }
+        )
+
+        console.log('updated', Object.entries(updateSculpt).length)
+    }
+
+    // maybe we need to remove colorways which is deleted sculpt
+    if (deletedSculpts.length) {
+        await deleteRows(sculptTable, deletedSculpts)
+
+        console.log('deleted', deletedSculpts.length)
     }
 }
 
@@ -109,7 +181,7 @@ const updateMakerDatabase = async (tables) => {
 
     // update sculpts
     const sculpts = tables.map(({ colorways, ...rest }) => rest)
-    upsert('sculpts', sculpts)
+    updateSculpts(sculpts)
 
     // update colorways
     const colorways = flatten(map(tables, 'colorways'))
@@ -160,7 +232,7 @@ const updateMakerDatabase = async (tables) => {
 
     if (insertClws.length) {
         sync = true
-        await insertColorways(insertClws)
+        await insertRows(colorwayTable, insertClws)
 
         console.log('inserted', insertClws.length)
     }
@@ -170,7 +242,7 @@ const updateMakerDatabase = async (tables) => {
 
         await Promise.map(
             Object.entries(updateClw),
-            ([id, data]) => updateColorway(id, data),
+            ([id, data]) => updateRow(colorwayTable, id, data),
             { concurrency: 1 }
         )
 
@@ -184,7 +256,7 @@ const updateMakerDatabase = async (tables) => {
     }
 
     if (deletedRows.length) {
-        await deleteColorways(deletedRows)
+        await deleteRows(colorwayTable, deletedRows)
 
         console.log('deleted', outdatedImages.length)
     }
