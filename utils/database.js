@@ -36,6 +36,7 @@ const makeSculptKey = (s) => {
         s.profile,
         s.cast,
         s.design,
+        s.img,
     ].join()
 }
 
@@ -50,7 +51,6 @@ const getGDocMakers = () =>
         .select()
         .like('src', '%docs.google.com%')
         .neq('deleted', true)
-        .in('id', ['mubai'])
         .then(({ data }) =>
             data.map((m) => {
                 return {
@@ -210,7 +210,7 @@ const updateMakerDatabase = async (tables) => {
         const key = makeKeyByOrder(c)
         if (insertingMap[key]) {
             const { remote_img, ...rest } = insertingMap[key]
-            updateClw[c.id] = rest
+            updateClw[`${c.id}__${c.colorway_id}`] = rest
 
             if (c.colorway_id !== rest.colorway_id) {
                 outdatedImages.push(makeImageId(c))
@@ -242,7 +242,20 @@ const updateMakerDatabase = async (tables) => {
 
         await Promise.map(
             Object.entries(updateClw),
-            ([id, data]) => updateRow(colorwayTable, id, data),
+            async ([rowKey, data]) => {
+                const [id, old_colorway_id] = rowKey.split('__')
+                await updateRow(colorwayTable, id, data)
+
+                await supabase
+                    .from('user_collection_items')
+                    .update({
+                        colorway_id: data.colorway_id,
+                        name: data.name,
+                    })
+                    .eq('maker_id', data.maker_id)
+                    .eq('sculpt_id', data.sculpt_id)
+                    .eq('colorway_id', old_colorway_id)
+            },
             { concurrency: 1 }
         )
 
