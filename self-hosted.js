@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 const fs = require('fs')
-const files = fs.readdirSync('./importers')
+const files = fs.readdirSync('./self-hosted')
 const Promise = require('bluebird')
 const { updateMakerDatabase } = require('./utils/database')
 

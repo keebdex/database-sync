@@ -102,6 +102,8 @@ const updateRow = async (table, id, values) => {
 }
 
 const updateSculpts = async (sculpts) => {
+    console.log('update sculpts')
+
     const { data: storedSculpts } = await supabase
         .from('sculpts')
         .select()
@@ -181,9 +183,10 @@ const updateMakerDatabase = async (tables) => {
 
     // update sculpts
     const sculpts = tables.map(({ colorways, ...rest }) => rest)
-    updateSculpts(sculpts)
+    await updateSculpts(sculpts)
 
     // update colorways
+    console.log('update colorways')
     const colorways = flatten(map(tables, 'colorways'))
     const storedColorways = await getColorways(maker_id)
 
