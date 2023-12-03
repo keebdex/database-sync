@@ -24,6 +24,7 @@ const makeColorwayKey = (c) => {
         c.commissioned,
         c.release,
         c.qty,
+        c.photo_credit,
         c.img,
     ].join()
 }
