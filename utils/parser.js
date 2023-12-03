@@ -9,6 +9,7 @@ const dreadkeysCommission = /\(Commission\)|\(Comission\)/gim
 const regQty = /\(count (\d+)\)/gim
 const regCommission = /\(\*\)/gim
 const regGiveaway = /\(giveaway\)|\(give-away\)/gim
+const regPhotoCredit = /\(pc (.*)\)/gim
 
 const attrs = {
     profile: {
@@ -128,6 +129,7 @@ const parser = (jsonDoc, maker_id) => {
                 commissioned: false,
                 release: null,
                 qty: null,
+                photo_credit: null,
                 order,
             }
 
@@ -177,6 +179,12 @@ const parser = (jsonDoc, maker_id) => {
             if (giveawayMatch) {
                 colorway.giveaway = true
                 text = text.replace(regGiveaway, '')
+            }
+            
+            const photoCreditMatch = regPhotoCredit.exec(text)
+            if (photoCreditMatch) {
+                colorway.photo_credit = photoCreditMatch[1]
+                text = text.replace(regPhotoCredit, '')
             }
 
             if (maker_id === 'fraktal-kaps') {
