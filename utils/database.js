@@ -44,7 +44,7 @@ const makeSculptKey = (s) => {
 const makeImageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
 const makeKeyByOrder = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
 
-const makeSculptId = (s) => `${s.maker_id}-${s.sculpt_id}`
+const makerSculptId = (s) => `${s.maker_id}/${s.sculpt_id}`
 
 const getGDocMakers = () =>
     supabase
@@ -86,8 +86,8 @@ const insertRows = async (table, values) => {
     }
 }
 
-const deleteRows = async (table, ids) => {
-    const { error } = await supabase.from(table).delete().in('id', ids)
+const deleteRows = async (table, column, values) => {
+    const { error } = await supabase.from(table).delete().in(column, values)
 
     if (error) {
         console.warn(`delete old ${table} error`, error)
@@ -123,7 +123,7 @@ const updateSculpts = async (sculpts) => {
         changedKeys.includes(makeSculptKey(s))
     )
 
-    const insertingMap = keyBy(tobeInserted, makeSculptId)
+    const insertingMap = keyBy(tobeInserted, makerSculptId)
 
     const updateSculpt = {}
     const deletedSculpts = []
@@ -133,13 +133,13 @@ const updateSculpts = async (sculpts) => {
      * so we accept that and remove old ones
      */
     tobeUpdated.forEach((s) => {
-        const key = makeSculptId(s)
+        const key = makerSculptId(s)
         if (insertingMap[key]) {
             updateSculpt[s.id] = insertingMap[key]
 
             delete insertingMap[key]
         } else {
-            deletedSculpts.push(s.id)
+            deletedSculpts.push(s)
         }
     })
 
@@ -163,7 +163,16 @@ const updateSculpts = async (sculpts) => {
 
     // maybe we need to remove colorways which is deleted sculpt
     if (deletedSculpts.length) {
-        await deleteRows(sculptTable, deletedSculpts)
+        await deleteRows(
+            colorwayTable,
+            'maker_sculpt_id',
+            deletedSculpts.map(makerSculptId)
+        )
+        await deleteRows(
+            sculptTable,
+            'id',
+            deletedSculpts.map((s) => s.id)
+        )
 
         console.log('deleted', deletedSculpts.length)
     }
@@ -273,7 +282,7 @@ const updateMakerDatabase = async (tables) => {
     }
 
     if (deletedRows.length) {
-        await deleteRows(colorwayTable, deletedRows)
+        await deleteRows(colorwayTable, 'id', deletedRows)
 
         console.log('deleted', outdatedImages.length)
     }

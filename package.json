@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "google-sync": "node google.js",
-    "selfhosted-sync": "node self-hosted.js"
+    "selfhosted-sync": "node self-hosted.js",
+    "prune-images": "node jobs/prune-images.js"
   },
   "repository": {
     "type": "git",
