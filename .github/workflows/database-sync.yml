@@ -15,8 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
-      GOOGLE_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLIENT_EMAIL }}
+      NODE_ENV: production
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
       CF_IMAGES_API_KEY: ${{ secrets.CF_IMAGES_API_KEY }}
@@ -31,6 +30,12 @@ jobs:
 
     - name: Install dependencies
       run: yarn install
+
+    - name: create-json secret
+      uses: jsdaniell/create-json@v1.2.2
+      with:
+        name: "keebtalogue.json"
+        json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
 
     - name: Sync from google docs
       run: yarn google-sync

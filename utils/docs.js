@@ -3,15 +3,7 @@ const path = require('path')
 
 const downloadDoc = async (documentId) => {
     const auth = new docs.auth.GoogleAuth({
-        // keyFile: path.join(
-        //     __dirname,
-        //     '..',
-        //     '/keeb-catalogue-gserviceaccount.json'
-        // ),
-        credentials: {
-            private_key: process.env.GOOGLE_PRIVATE_KEY,
-            client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        },
+        keyFile: path.join(__dirname, '..', '/keebtalogue.json'),
         scopes: ['https://www.googleapis.com/auth/documents'],
     })
 
