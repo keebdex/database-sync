@@ -1,0 +1,39 @@
+name: Keebtalogue Database Sync
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 0 * * *" # Everyday
+
+  push:
+    branches: [ "main" ]
+
+jobs:
+  database-sync:
+
+    runs-on: ubuntu-latest
+
+    env:
+      GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+      GOOGLE_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLIENT_EMAIL }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      CF_IMAGES_API_KEY: ${{ secrets.CF_IMAGES_API_KEY }}
+      CF_IMAGES_ACCOUNT_ID: ${{ secrets.CF_IMAGES_ACCOUNT_ID }}
+      CF_IMAGES_ACCOUNT_HASH: ${{ secrets.CF_IMAGES_ACCOUNT_HASH }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Sync from google docs
+      run: yarn google-sync
+
+    - name: Sync from maker website/api
+      run: yarn selfhosted-sync

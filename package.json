@@ -4,22 +4,24 @@
   "description": "scraper tools for keebtalogue",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "google-sync": "node google.js",
+    "selfhosted-sync": "node self-hosted.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anhthang/keebtalogue-prometheus.git"
+    "url": "git+https://github.com/anhthang/keebtalogue-agent.git"
   },
   "author": "Anh Thang Bui <buianhthang89@gmail.com> (https://anhthang.org)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/anhthang/keebtalogue-prometheus/issues"
+    "url": "https://github.com/anhthang/keebtalogue-agent/issues"
   },
-  "homepage": "https://github.com/anhthang/keebtalogue-prometheus#readme",
+  "homepage": "https://github.com/anhthang/keebtalogue-agent#readme",
   "dependencies": {
     "@googleapis/docs": "^3.0.0",
-    "@supabase/supabase-js": "^2.38.2",
-    "axios": "^1.5.1",
+    "@supabase/supabase-js": "^2.39.0",
+    "axios": "^1.6.2",
     "bluebird": "^3.7.2",
     "camaro": "^6.2.1",
     "crc": "^4.3.2",
