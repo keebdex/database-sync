@@ -1,5 +1,5 @@
 const { format, parse } = require('date-fns')
-const { chunk, flatten, findLast, get } = require('lodash')
+const { chunk, flatten, findLast, get, keyBy } = require('lodash')
 const { urlSlugify } = require('./slugify')
 
 const regRelease = /\(([a-zA-Z0-9 ]*\d{4})\)/gim
@@ -180,7 +180,7 @@ const parser = (jsonDoc, maker_id) => {
                 colorway.giveaway = true
                 text = text.replace(regGiveaway, '')
             }
-            
+
             const photoCreditMatch = regPhotoCredit.exec(text)
             if (photoCreditMatch) {
                 colorway.photo_credit = photoCreditMatch[1]
@@ -236,7 +236,10 @@ const parser = (jsonDoc, maker_id) => {
         return sculpt
     })
 
-    return sculpts.filter((s) => s && s.name && s.colorways.length)
+    return keyBy(
+        sculpts.filter((s) => s && s.name && s.colorways.length),
+        (s) => `${s.maker_id}/${s.sculpt_id}`
+    )
 }
 
 module.exports = { parser }

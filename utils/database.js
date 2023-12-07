@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js')
 const Promise = require('bluebird')
 const { writeFileSync } = require('fs')
-const { flatten, difference, map, keyBy, isEmpty, uniqBy, reverse } = require('lodash')
+const { flatten, difference, map, keyBy, isEmpty } = require('lodash')
 const { deleteImage } = require('./image')
 
 const supabase = createClient(
@@ -26,6 +26,7 @@ const makeColorwayKey = (c) => {
         c.qty,
         c.photo_credit,
         c.img,
+        c.order,
     ].join()
 }
 
@@ -42,7 +43,6 @@ const makeSculptKey = (s) => {
 }
 
 const makeImageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
-const makeKeyByOrder = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
 
 const makerSculptId = (s) => `${s.maker_id}/${s.sculpt_id}`
 
@@ -95,16 +95,12 @@ const updateRow = async (table, id, values) => {
 }
 
 const updateSculpts = async (sculpts) => {
-    console.log('update sculpts')
-
     const { data: storedSculpts } = await supabase
         .from('sculpts')
         .select()
         .eq('maker_id', sculpts[0].maker_id)
 
-    const incomingKeys = uniqBy(reverse(sculpts), makerSculptId).map(
-        makeSculptKey
-    )
+    const incomingKeys = sculpts.map(makeSculptKey)
     const existedKeys = storedSculpts.map(makeSculptKey)
 
     const newKeys = difference(incomingKeys, existedKeys)
@@ -142,7 +138,7 @@ const updateSculpts = async (sculpts) => {
     if (newSculpts.length) {
         await insertRows(sculptTable, newSculpts)
 
-        console.log('inserted', newSculpts.length)
+        console.log('sculpts inserted', newSculpts.length)
     }
 
     if (!isEmpty(updateSculpt)) {
@@ -152,7 +148,7 @@ const updateSculpts = async (sculpts) => {
             { concurrency: 1 }
         )
 
-        console.log('updated', Object.entries(updateSculpt).length)
+        console.log('sculpts updated', Object.entries(updateSculpt).length)
     }
 
     // maybe we need to remove colorways which is deleted sculpt
@@ -168,7 +164,7 @@ const updateSculpts = async (sculpts) => {
             deletedSculpts.map((s) => s.id)
         )
 
-        console.log('deleted', deletedSculpts.length)
+        console.log('sculpts deleted', deletedSculpts.length)
     }
 }
 
@@ -190,7 +186,6 @@ const updateMakerDatabase = async (tables) => {
     await updateSculpts(sculpts)
 
     // update colorways
-    console.log('update colorways')
     const colorways = flatten(map(tables, 'colorways'))
     const storedColorways = await getColorways(maker_id)
 
@@ -207,26 +202,26 @@ const updateMakerDatabase = async (tables) => {
         changedKeys.includes(makeColorwayKey(c))
     )
 
-    const insertingMap = keyBy(tobeInserted, makeKeyByOrder)
+    const insertingMap = keyBy(tobeInserted, makeImageId)
 
     const outdatedImages = []
     const updateClw = {}
     const deletedRows = []
 
     tobeUpdated.forEach((c) => {
-        const key = makeKeyByOrder(c)
+        const key = makeImageId(c)
         if (insertingMap[key]) {
             const { remote_img, ...rest } = insertingMap[key]
             updateClw[`${c.id}__${c.colorway_id}`] = rest
 
             if (c.colorway_id !== rest.colorway_id) {
-                outdatedImages.push(makeImageId(c))
+                outdatedImages.push(key)
             }
 
             delete insertingMap[key]
         } else {
             // colorway deleted, to be removed from the database
-            outdatedImages.push(makeImageId(c))
+            outdatedImages.push(key)
             deletedRows.push(c.id)
         }
     })
@@ -241,7 +236,7 @@ const updateMakerDatabase = async (tables) => {
         sync = true
         await insertRows(colorwayTable, insertClws)
 
-        console.log('inserted', insertClws.length)
+        console.log('colorways inserted', insertClws.length)
     }
 
     if (!isEmpty(updateClw)) {
@@ -266,7 +261,7 @@ const updateMakerDatabase = async (tables) => {
             { concurrency: 1 }
         )
 
-        console.log('updated', Object.entries(updateClw).length)
+        console.log('colorways updated', Object.entries(updateClw).length)
     }
 
     if (outdatedImages.length) {
@@ -278,7 +273,7 @@ const updateMakerDatabase = async (tables) => {
     if (deletedRows.length) {
         await deleteRows(colorwayTable, 'id', deletedRows)
 
-        console.log('deleted', outdatedImages.length)
+        console.log('colorways deleted', outdatedImages.length)
     }
 
     return { sync, colorways }
