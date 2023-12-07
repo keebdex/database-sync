@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js')
 const Promise = require('bluebird')
 const { writeFileSync } = require('fs')
-const { flatten, difference, map, keyBy, isEmpty } = require('lodash')
+const { flatten, difference, map, keyBy, isEmpty, uniqBy, reverse } = require('lodash')
 const { deleteImage } = require('./image')
 
 const supabase = createClient(
@@ -49,17 +49,9 @@ const makerSculptId = (s) => `${s.maker_id}/${s.sculpt_id}`
 const getGDocMakers = () =>
     supabase
         .from('makers')
-        .select()
-        .like('src', '%docs.google.com%')
+        .select('id, document_ids')
         .neq('deleted', true)
-        .then(({ data }) =>
-            data.map((m) => {
-                return {
-                    id: m.id,
-                    document_id: m.src.split('/')[5],
-                }
-            })
-        )
+        .then(({ data }) => data.filter((r) => Array.isArray(r.document_ids)))
 
 const getColorways = async (maker_id, rows = []) => {
     const { data } = await supabase
@@ -110,7 +102,9 @@ const updateSculpts = async (sculpts) => {
         .select()
         .eq('maker_id', sculpts[0].maker_id)
 
-    const incomingKeys = sculpts.map(makeSculptKey)
+    const incomingKeys = uniqBy(reverse(sculpts), makerSculptId).map(
+        makeSculptKey
+    )
     const existedKeys = storedSculpts.map(makeSculptKey)
 
     const newKeys = difference(incomingKeys, existedKeys)

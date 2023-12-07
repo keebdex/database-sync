@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const Promise = require('bluebird')
+const deepmerge = require('deepmerge')
 const {
     getGDocMakers,
     makeImageId,
@@ -36,8 +37,12 @@ async function syncImages({ sync = false, colorways }) {
 async function scan(maker) {
     console.log('start downloading:', maker.id)
 
-    return downloadDoc(maker.document_id)
-        .then((jsonDoc) => parser(jsonDoc, maker.id))
+    return Promise.all(
+            maker.document_ids.map((docId) =>
+                downloadDoc(docId).then((json) => parser(json, maker.id))
+            )
+        )
+        .then(deepmerge.all)
         .then(updateMakerDatabase)
         .then(syncImages)
         .catch((err) => {

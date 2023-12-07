@@ -12,10 +12,13 @@ const supabase = createClient(
 
 const makeImageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
 
+const selfhostedMakers = ['alpha-keycaps', 'gooey-keys']
+
 const getColorways = async (rows = []) => {
     const { data } = await supabase
         .from('colorways')
         .select('maker_id, sculpt_id, colorway_id')
+        .not('maker_id', 'in', `(${selfhostedMakers.join()})`)
         .order('id')
         .range(rows.length, rows.length + 999)
 
