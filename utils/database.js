@@ -279,8 +279,17 @@ const updateMakerDatabase = async (tables) => {
     return { sync, colorways }
 }
 
+const updateMetadata = async (id, data) => {
+    const { error } = await supabase.from('makers').update(data).eq('id', id)
+
+    if (error) {
+        console.warn(`update maker error`, id, error)
+    }
+}
+
 module.exports = {
     getGDocMakers,
     makeImageId,
     updateMakerDatabase,
+    updateMetadata,
 }

@@ -21,6 +21,7 @@
   "homepage": "https://github.com/anhthang/keebtalogue-agent#readme",
   "dependencies": {
     "@googleapis/docs": "^3.0.0",
+    "@googleapis/drive": "^8.4.0",
     "@supabase/supabase-js": "^2.39.0",
     "axios": "^1.6.2",
     "bluebird": "^3.7.2",
