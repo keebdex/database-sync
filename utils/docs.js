@@ -20,24 +20,28 @@ const downloadDoc = async (documentId) => {
         })
         .documents.get({ documentId })
 
-    const { data: metadata } = await drive
+    const {
+        data: { owners, lastModifyingUser, modifiedDate },
+    } = await drive
         .drive({
             version: 'v2',
             auth: authClient,
         })
         .files.get({ fileId: documentId })
 
-    const contributors = metadata.owners
-        .concat([metadata.lastModifyingUser])
-        .map((u) => ({
-            name: u.displayName,
-            picture: u.picture.url,
-        }))
+    const users = lastModifyingUser
+        ? owners.concat([lastModifyingUser])
+        : owners
+
+    const contributors = users.map((u) => ({
+        name: u.displayName,
+        picture: u?.picture?.url,
+    }))
 
     return {
         document,
         contributors,
-        updated_at: metadata.modifiedDate,
+        updated_at: modifiedDate,
     }
 }
 
