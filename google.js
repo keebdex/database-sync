@@ -8,10 +8,10 @@ const {
     updateMakerDatabase,
     updateMetadata,
 } = require('./utils/database')
-const { downloadDoc } = require('./utils/docs')
+const { downloadDoc, getFile } = require('./utils/docs')
 const { uploadImage, getListImages } = require('./utils/image')
 const { parser } = require('./utils/parser')
-const { uniqBy, map, findLast, flattenDeep } = require('lodash')
+const { findLast } = require('lodash')
 
 let existedImages = []
 
@@ -39,15 +39,9 @@ async function scan(maker) {
     try {
         const files = await Promise.all(maker.document_ids.map(downloadDoc))
 
-        const contributors = uniqBy(
-            flattenDeep(map(files, 'contributors')),
-            'name'
-        )
-        const updated_at = findLast(files).updated_at
-
         const multi = maker.document_ids.length > 1
 
-        const documents = files.map((f) => parser(f.document, maker.id))
+        const documents = files.map((file) => parser(file, maker.id))
         const catalogue = multi
             ? deepmerge.all(documents, { customMerge })
             : documents[0]
@@ -58,7 +52,9 @@ async function scan(maker) {
 
         if (!sync) return
 
-        await updateMetadata(maker.id, { contributors, updated_at })
+        const metadata = await getFile(findLast(maker.document_ids))
+
+        await updateMetadata(maker.id, metadata)
 
         const images = []
         colorways.map((clw) => {

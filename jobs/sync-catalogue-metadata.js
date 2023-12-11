@@ -11,39 +11,63 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 )
 
-const getDocIds = () => supabase
-    .from('makers')
-    .select('id, document_ids')
-    .neq('deleted', true)
-    .then(({ data }) => data.filter((r) => Array.isArray(r.document_ids)))
-    .then(makers => flattenDeep(makers.map(m => m.document_ids)))
+const getActiveDocIds = () =>
+    supabase
+        .from('makers')
+        .select('id, document_ids')
+        .neq('deleted', true)
+        .then(({ data }) => data.filter((r) => Array.isArray(r.document_ids)))
+        .then((makers) => {
+            return flattenDeep(
+                makers.map((m) =>
+                    m.document_ids.map((doc_id) => ({ maker_id: m.id, doc_id }))
+                )
+            )
+        })
 
-const syncMetadata = async fileId => {
+const getExistedDocIds = () =>
+    supabase
+        .from('raw_document_metadata')
+        .select('doc_id')
+        .then(({ data }) => data.map((r) => r.doc_id))
+
+let existedIds = []
+
+const syncMetadata = async ({ maker_id, doc_id }) => {
     const auth = new drive.auth.GoogleAuth({
         keyFile: path.join(__dirname, '..', '/keebtalogue.json'),
-        scopes: [
-            'https://www.googleapis.com/auth/drive',
-        ],
+        scopes: ['https://www.googleapis.com/auth/drive'],
     })
 
-    const authClient = await auth.getClient()
     const { data } = await drive
-        .drive({
-            version: 'v2',
-            auth: authClient,
-        })
-        .files.get({ fileId })
+        .drive({ version: 'v3', auth })
+        .files.get({ fileId: doc_id, fields: '*' })
 
     const metadata = {
         doc_id: data.id,
-        title: data.title,
+        maker_id,
+        title: data.name,
         owners: data.owners,
-        created_at: data.createdDate,
-        modified_at: data.modifiedDate,
-        last_modifying_user: data.lastModifyingUser
+        created_at: data.createdTime,
+        last_modified_at: data.modifiedTime,
+        last_modifying_user: data.lastModifyingUser,
     }
 
-    await supabase.from('raw_document_metadata').insert(metadata)
+    if (existedIds.includes(doc_id)) {
+        await supabase
+            .from('raw_document_metadata')
+            .update(metadata)
+            .eq('doc_id', doc_id)
+    } else {
+        await supabase.from('raw_document_metadata').insert(metadata)
+    }
 }
 
-getDocIds().then(docIds => Promise.map(docIds, syncMetadata, { concurrency: 1 }))
+const startSync = async () => {
+    existedIds = await getExistedDocIds()
+    const activeDocIds = await getActiveDocIds()
+
+    await Promise.map(activeDocIds, syncMetadata, { concurrency: 1 })
+}
+
+startSync()

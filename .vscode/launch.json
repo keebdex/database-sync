@@ -30,6 +30,15 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/jobs/prune-images.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Sync Catalogue Metadata",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/jobs/sync-catalogue-metadata.js"
         }
     ]
 }
