@@ -1,6 +1,5 @@
 const docs = require('@googleapis/docs')
 const drive = require('@googleapis/drive')
-const { uniqBy } = require('lodash')
 const path = require('path')
 
 const downloadDoc = async (documentId) => {
@@ -13,7 +12,7 @@ const downloadDoc = async (documentId) => {
         .docs({ version: 'v1', auth })
         .documents.get({ documentId })
 
-    return document
+    return document.data
 }
 
 const getFile = async (fileId) => {
@@ -22,25 +21,11 @@ const getFile = async (fileId) => {
         scopes: ['https://www.googleapis.com/auth/drive'],
     })
 
-    const {
-        data: { owners, lastModifyingUser, modifiedTime },
-    } = await drive
+    const data = await drive
         .drive({ version: 'v3', auth })
         .files.get({ fileId, fields: '*' })
 
-    const users = lastModifyingUser
-        ? owners.concat([lastModifyingUser])
-        : owners
-
-    const contributors = uniqBy(users, 'displayName').map((u) => ({
-        name: u.displayName,
-        picture: u.photoLink,
-    }))
-
-    return {
-        contributors,
-        updated_at: modifiedTime,
-    }
+    return data.data
 }
 
 module.exports = { downloadDoc, getFile }

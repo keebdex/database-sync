@@ -11,7 +11,7 @@ const {
 const { downloadDoc, getFile } = require('./utils/docs')
 const { uploadImage, getListImages } = require('./utils/image')
 const { parser } = require('./utils/parser')
-const { findLast } = require('lodash')
+const { findLast, uniqBy } = require('lodash')
 
 let existedImages = []
 
@@ -36,12 +36,14 @@ function customMerge(key) {
 async function scan(maker) {
     console.log('start downloading:', maker.id)
 
+    const { id, document_ids, contributors } = maker
+
     try {
-        const files = await Promise.all(maker.document_ids.map(downloadDoc))
+        const files = await Promise.all(document_ids.map(downloadDoc))
 
-        const multi = maker.document_ids.length > 1
+        const multi = document_ids.length > 1
 
-        const documents = files.map((file) => parser(file, maker.id))
+        const documents = files.map((file) => parser(file, id))
         const catalogue = multi
             ? deepmerge.all(documents, { customMerge })
             : documents[0]
@@ -52,9 +54,20 @@ async function scan(maker) {
 
         if (!sync) return
 
-        const metadata = await getFile(findLast(maker.document_ids))
+        const file = await getFile(findLast(document_ids))
 
-        await updateMetadata(maker.id, metadata)
+        if (file.lastModifyingUser) {
+            contributors.push({
+                name: file.lastModifyingUser.displayName,
+                picture: file.lastModifyingUser.photoLink,
+                pid: file.lastModifyingUser.permissionId,
+            })
+        }
+
+        await updateMetadata(id, {
+            contributors: uniqBy(contributors, 'pid'),
+            updated_at: file.modifiedTime,
+        })
 
         const images = []
         colorways.map((clw) => {
@@ -72,11 +85,7 @@ async function scan(maker) {
             })
         }
     } catch (error) {
-        console.error(
-            'catalogue deleted or sth went wrong',
-            maker.id,
-            error.stack
-        )
+        console.error('catalogue deleted or sth went wrong', id, error.stack)
     }
 }
 

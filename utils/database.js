@@ -49,7 +49,7 @@ const makerSculptId = (s) => `${s.maker_id}/${s.sculpt_id}`
 const getGDocMakers = () =>
     supabase
         .from('makers')
-        .select('id, document_ids')
+        .select()
         .neq('deleted', true)
         .then(({ data }) => data.filter((r) => Array.isArray(r.document_ids)))
 

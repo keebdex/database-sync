@@ -103,8 +103,8 @@ const parseSculpt = (table, maker_id) => {
     return sculpt
 }
 
-const parser = (jsonDoc, maker_id) => {
-    const tables = jsonDoc.data.body.content.filter((b) => b.table)
+const parser = (document, maker_id) => {
+    const tables = document.body.content.filter((b) => b.table)
 
     const chunks = chunk(tables, 2)
     const sculpts = chunks.map((chunk) => {
@@ -141,7 +141,7 @@ const parser = (jsonDoc, maker_id) => {
 
                 if (element?.inlineObjectElement?.inlineObjectId) {
                     const obj =
-                        jsonDoc.data.inlineObjects[
+                        document.inlineObjects[
                             element.inlineObjectElement.inlineObjectId
                         ]
                     const img = get(
