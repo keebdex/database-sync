@@ -8,7 +8,7 @@ const {
     updateMakerDatabase,
     updateMetadata,
 } = require('./utils/database')
-const { downloadDoc, getFile } = require('./utils/docs')
+const { downloadDoc, getFile, getRevisions } = require('./utils/docs')
 const { uploadImage, getListImages } = require('./utils/image')
 const { parser } = require('./utils/parser')
 const { findLast, uniqBy } = require('lodash')
@@ -36,7 +36,7 @@ function customMerge(key) {
 async function scan(maker) {
     console.log('start downloading:', maker.id)
 
-    const { id, document_ids, contributors } = maker
+    let { id, document_ids, contributors } = maker
 
     try {
         const files = await Promise.all(document_ids.map(downloadDoc))
@@ -54,9 +54,24 @@ async function scan(maker) {
 
         if (!sync) return
 
-        const file = await getFile(findLast(document_ids))
+        const fileId = findLast(document_ids)
+        const file = await getFile(fileId)
 
-        if (file.lastModifyingUser) {
+        if (file?.capabilities?.canReadRevisions) {
+            let revisions = await getRevisions(fileId)
+            revisions = uniqBy(
+                revisions,
+                (r) => r?.lastModifyingUser?.permissionId
+            )
+
+            revisions.forEach((revision) => {
+                contributors.push({
+                    name: revision.lastModifyingUser.displayName,
+                    picture: revision.lastModifyingUser.photoLink,
+                    pid: revision.lastModifyingUser.permissionId,
+                })
+            })
+        } else if (file.lastModifyingUser) {
             contributors.push({
                 name: file.lastModifyingUser.displayName,
                 picture: file.lastModifyingUser.photoLink,
@@ -64,8 +79,10 @@ async function scan(maker) {
             })
         }
 
+        contributors = uniqBy(contributors, 'pid')
+
         await updateMetadata(id, {
-            contributors: uniqBy(contributors, 'pid'),
+            contributors,
             updated_at: file.modifiedTime,
         })
 

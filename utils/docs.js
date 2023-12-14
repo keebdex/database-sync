@@ -8,11 +8,11 @@ const downloadDoc = async (documentId) => {
         scopes: ['https://www.googleapis.com/auth/documents'],
     })
 
-    const document = await docs
+    const { data } = await docs
         .docs({ version: 'v1', auth })
         .documents.get({ documentId })
 
-    return document.data
+    return data
 }
 
 const getFile = async (fileId) => {
@@ -21,11 +21,30 @@ const getFile = async (fileId) => {
         scopes: ['https://www.googleapis.com/auth/drive'],
     })
 
-    const data = await drive
+    const { data } = await drive
         .drive({ version: 'v3', auth })
         .files.get({ fileId, fields: '*' })
 
-    return data.data
+    return data
 }
 
-module.exports = { downloadDoc, getFile }
+const getRevisions = async (fileId, revisions = [], pageToken) => {
+    const auth = new drive.auth.GoogleAuth({
+        keyFile: path.join(__dirname, '..', '/keebtalogue.json'),
+        scopes: ['https://www.googleapis.com/auth/drive'],
+    })
+
+    const { data } = await drive
+        .drive({ version: 'v3', auth })
+        .revisions.list({ fileId, fields: '*', pageToken })
+
+    revisions = revisions.concat(data.revisions)
+
+    if (data.nextPageToken) {
+        return getRevisions(fileId, revisions, data.nextPageToken)
+    }
+
+    return revisions
+}
+
+module.exports = { downloadDoc, getFile, getRevisions }
