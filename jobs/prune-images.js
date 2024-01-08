@@ -10,7 +10,8 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 )
 
-const makeImageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
+const makeImageId = (c) =>
+    `artisan/${c.maker_id}/${c.sculpt_id}/${c.colorway_id}`
 
 const selfhostedMakers = ['alpha-keycaps', 'gooey-keys']
 
@@ -34,7 +35,8 @@ const getColorways = async (rows = []) => {
 getColorways()
     .then((rows) => rows.map(makeImageId))
     .then(async (dbImages) => {
-        const remoteImages = await getListImages()
+        let images = await getListImages()
+        images = images.filter((i) => i.includes('artisan/'))
 
         const diff = difference(remoteImages, dbImages)
 

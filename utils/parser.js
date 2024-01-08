@@ -151,7 +151,7 @@ const parser = (document, maker_id) => {
 
                     colorway.remote_img = img
                     colorway.colorway_id = obj.objectId
-                    colorway.img = `https://imagedelivery.net/${process.env.CF_IMAGES_ACCOUNT_HASH}/${maker_id}-${sculpt.sculpt_id}-${obj.objectId}/public`
+                    colorway.img = `https://imagedelivery.net/${process.env.CF_IMAGES_ACCOUNT_HASH}/artisan/${maker_id}/${sculpt.sculpt_id}/${obj.objectId}/public`
                 }
             })
 

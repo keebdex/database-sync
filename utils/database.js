@@ -42,7 +42,8 @@ const makeSculptKey = (s) => {
     ].join()
 }
 
-const makeImageId = (c) => `${c.maker_id}-${c.sculpt_id}-${c.colorway_id}`
+const makeImageId = (c) =>
+    `artisan/${c.maker_id}/${c.sculpt_id}/${c.colorway_id}`
 
 const makerSculptId = (s) => `${s.maker_id}/${s.sculpt_id}`
 
