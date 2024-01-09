@@ -34,11 +34,11 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Sync Catalogue Metadata",
+            "name": "Launch Sync Keycap Images",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/jobs/sync-catalogue-metadata.js"
+            "program": "${workspaceFolder}/jobs/sync-keycap-images.js"
         }
     ]
 }

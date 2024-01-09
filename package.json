@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "google-sync": "node google.js",
     "selfhosted-sync": "node self-hosted.js",
+    "sync-keycaps": "node jobs/sync-keycaps.js",
     "prune-images": "node jobs/prune-images.js"
   },
   "repository": {
@@ -21,13 +22,13 @@
   "homepage": "https://github.com/anhthang/keebtalogue-agent#readme",
   "dependencies": {
     "@googleapis/docs": "^3.0.0",
-    "@googleapis/drive": "^8.4.0",
-    "@supabase/supabase-js": "^2.39.0",
-    "axios": "^1.6.2",
+    "@googleapis/drive": "^8.5.0",
+    "@supabase/supabase-js": "^2.39.2",
+    "axios": "^1.6.5",
     "bluebird": "^3.7.2",
-    "camaro": "^6.2.1",
+    "camaro": "^6.2.2",
     "crc": "^4.3.2",
-    "date-fns": "^2.30.0",
+    "date-fns": "^3.1.0",
     "deepmerge": "^4.3.1",
     "dotenv": "^16.3.1",
     "ini": "^4.1.1",

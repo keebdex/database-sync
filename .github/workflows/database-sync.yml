@@ -43,5 +43,5 @@ jobs:
     - name: Sync from maker website/api
       run: yarn selfhosted-sync
 
-    - name: Prune old images
-      run: yarn prune-images
+    - name: Sync new keycaps
+      run: yarn sync-keycaps
