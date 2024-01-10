@@ -38,7 +38,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/jobs/sync-keycap-images.js"
+            "program": "${workspaceFolder}/jobs/sync-keycaps.js"
         }
     ]
 }

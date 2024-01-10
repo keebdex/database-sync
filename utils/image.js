@@ -20,7 +20,7 @@ async function downloadImage(url, filename) {
     )
 }
 
-async function uploadImage(filename, url) {
+async function uploadImage(filename, url, promise) {
     let data = new FormData()
 
     data.append('url', url)
@@ -37,8 +37,10 @@ async function uploadImage(filename, url) {
     }
 
     await axios(config)
-        .then(({ data }) => {
-            // console.log(JSON.stringify(response.data))
+        .then(async ({ data }) => {
+            if (promise) {
+                await promise
+            }
         })
         .catch(({ response, message }) => {
             const { data } = response

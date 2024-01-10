@@ -2,7 +2,7 @@ require('dotenv').config()
 
 const { createClient } = require('@supabase/supabase-js')
 const Promise = require('bluebird')
-const { uploadImage } = require('../utils/image')
+const { uploadImage, deleteImage } = require('../utils/image')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -15,8 +15,8 @@ const getKeycaps = async (rows = []) => {
     const { data } = await supabase
         .from('keycaps')
         .select('img, render_img, profile_keycap_id')
-        .is('img', null)
         .neq('render_img', '')
+        .or('img.is.null, img.eq.""')
         .order('id')
         .range(rows.length, rows.length + 999)
 
@@ -32,18 +32,18 @@ const getKeycaps = async (rows = []) => {
 const syncNewKeycap = async (keycap) => {
     const filename = makeImageId(keycap)
 
-    try {
-        await uploadImage(filename, keycap.render_img)
+    const promise = supabase
+        .from('keycaps')
+        .update({
+            img: `https://imagedelivery.net/${process.env.CF_IMAGES_ACCOUNT_HASH}/keycap/${keycap.profile_keycap_id}/public`,
+        })
+        .eq('profile_keycap_id', keycap.profile_keycap_id)
 
-        await supabase
-            .from('keycaps')
-            .update({
-                img: `https://imagedelivery.net/${process.env.CF_IMAGES_ACCOUNT_HASH}/keycap/${keycap.profile_keycap_id}/public`,
-            })
-            .eq('profile_keycap_id', keycap.profile_keycap_id)
-    } catch (error) {
-        console.log(error)
+    if (keycap.img === '') {
+        await deleteImage(filename)
     }
+
+    await uploadImage(filename, keycap.render_img, promise)
 }
 
 getKeycaps()
