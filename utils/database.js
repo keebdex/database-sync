@@ -231,17 +231,17 @@ const updateMakerDatabase = async (tables) => {
         ({ remote_img, ...rest }) => rest
     )
 
-    let sync = false
+    let modified = false
 
     if (insertClws.length) {
-        sync = true
+        modified = true
         await insertRows(colorwayTable, insertClws)
 
         console.log('colorways inserted', insertClws.length)
     }
 
     if (!isEmpty(updateClw)) {
-        sync = true
+        modified = true
 
         await Promise.map(
             Object.entries(updateClw),
@@ -277,7 +277,7 @@ const updateMakerDatabase = async (tables) => {
         console.log('colorways deleted', outdatedImages.length)
     }
 
-    return { sync, colorways }
+    return { modified, colorways }
 }
 
 const updateMetadata = async (id, data) => {

@@ -36,7 +36,7 @@ function customMerge(key) {
 async function scan(maker) {
     console.log('start downloading:', maker.id)
 
-    let { id, document_ids, contributors } = maker
+    let { id, document_ids, contributors = [] } = maker
 
     try {
         const files = await Promise.all(document_ids.map(downloadDoc))
@@ -50,41 +50,41 @@ async function scan(maker) {
 
         const database = Object.values(catalogue)
 
-        const { sync, colorways } = await updateMakerDatabase(database)
+        const { modified, colorways } = await updateMakerDatabase(database)
 
-        if (!sync) return
+        if (modified) {
+            const fileId = findLast(document_ids)
+            const file = await getFile(fileId)
 
-        const fileId = findLast(document_ids)
-        const file = await getFile(fileId)
+            if (file?.capabilities?.canReadRevisions) {
+                let revisions = await getRevisions(fileId)
+                revisions = uniqBy(
+                    revisions,
+                    (r) => r?.lastModifyingUser?.permissionId
+                )
 
-        if (file?.capabilities?.canReadRevisions) {
-            let revisions = await getRevisions(fileId)
-            revisions = uniqBy(
-                revisions,
-                (r) => r?.lastModifyingUser?.permissionId
-            )
-
-            revisions.forEach((revision) => {
-                contributors.push({
-                    name: revision.lastModifyingUser.displayName,
-                    picture: revision.lastModifyingUser.photoLink,
-                    pid: revision.lastModifyingUser.permissionId,
+                revisions.forEach((revision) => {
+                    contributors.push({
+                        name: revision.lastModifyingUser.displayName,
+                        picture: revision.lastModifyingUser.photoLink,
+                        pid: revision.lastModifyingUser.permissionId,
+                    })
                 })
-            })
-        } else if (file.lastModifyingUser) {
-            contributors.push({
-                name: file.lastModifyingUser.displayName,
-                picture: file.lastModifyingUser.photoLink,
-                pid: file.lastModifyingUser.permissionId,
+            } else if (file.lastModifyingUser) {
+                contributors.push({
+                    name: file.lastModifyingUser.displayName,
+                    picture: file.lastModifyingUser.photoLink,
+                    pid: file.lastModifyingUser.permissionId,
+                })
+            }
+
+            contributors = uniqBy(contributors, 'pid')
+
+            await updateMetadata(id, {
+                contributors,
+                updated_at: file.modifiedTime,
             })
         }
-
-        contributors = uniqBy(contributors, 'pid')
-
-        await updateMetadata(id, {
-            contributors,
-            updated_at: file.modifiedTime,
-        })
 
         const images = []
         colorways.map((clw) => {
