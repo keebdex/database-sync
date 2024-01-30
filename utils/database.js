@@ -30,6 +30,8 @@ const makeColorwayKey = (c) => {
     ].join()
 }
 
+const makeColorwayOrder = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
+
 const makeSculptKey = (s) => {
     return [
         s.maker_id,
@@ -203,26 +205,26 @@ const updateMakerDatabase = async (tables) => {
         changedKeys.includes(makeColorwayKey(c))
     )
 
-    const insertingMap = keyBy(tobeInserted, makeImageId)
+    const insertingMap = keyBy(tobeInserted, makeColorwayOrder)
 
     const outdatedImages = []
     const updateClw = {}
     const deletedRows = []
 
     tobeUpdated.forEach((c) => {
-        const key = makeImageId(c)
+        const key = makeColorwayOrder(c)
         if (insertingMap[key]) {
             const { remote_img, ...rest } = insertingMap[key]
             updateClw[`${c.id}__${c.colorway_id}`] = rest
 
             if (c.colorway_id !== rest.colorway_id) {
-                outdatedImages.push(key)
+                outdatedImages.push(makeImageId(c))
             }
 
             delete insertingMap[key]
         } else {
             // colorway deleted, to be removed from the database
-            outdatedImages.push(key)
+            outdatedImages.push(makeImageId(c))
             deletedRows.push(c.id)
         }
     })
