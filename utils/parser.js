@@ -10,6 +10,7 @@ const regQty = /\(count (\d+)\)/gim
 const regCommission = /\(\*\)/gim
 const regGiveaway = /\(giveaway\)|\(give-away\)/gim
 const regPhotoCredit = /\(pc (.*)\)/gim
+const regArtisanKeycap = /artisan keycaps|artisan keycap/gim
 
 const attrs = {
     profile: {
@@ -35,6 +36,7 @@ const normalize = (text) => {
         .replace(/\u200e/g, '') // cysm sculpt name
         .replace(/\u200f/g, '') // cysm sculpt name
         .replace(/\u200b/g, '') // cysm sculpt name
+        .replaceAll('  ', ' ')
         .trim()
 }
 
@@ -81,6 +83,11 @@ const parseSculpt = (table, maker_id) => {
                 )
             }
             text = text.replace(jellyReg, '')
+        }
+
+        const endsWith = regArtisanKeycap.exec(text)
+        if (endsWith) {
+            text = text.replace(regArtisanKeycap, '')
         }
     }
 
