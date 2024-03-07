@@ -24,9 +24,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4.1.1
+    - name: Enable Corepack
+      run: corepack enable
 
-    - name: Use Node.js
+    - name: Use Node.js 20.x
       uses: actions/setup-node@v4.0.2
+      with:
+        node-version: 20
+        cache: 'yarn'
 
     - name: Install dependencies
       run: yarn install
