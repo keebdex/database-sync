@@ -109,6 +109,10 @@ async function scan(maker) {
 getGDocMakers().then(async (makers) => {
     existedImages = await getListImages()
 
+    makers = makers.filter(
+        (m) => Array.isArray(m.document_ids) && m.document_ids.length
+    )
+
     console.log('existed images', existedImages.length)
 
     await Promise.map(makers, scan, { concurrency: 1 })

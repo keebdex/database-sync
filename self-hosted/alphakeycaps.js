@@ -32,7 +32,7 @@ const sculptScraper = async (sculpt_id, sculpt_name) => {
             giveaway: false,
             commissioned: false,
             colorway_id: crc32(
-                `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
+                `${maker_id}-${sculpt_id}-${urlSlugify(name)}-${order}`
             ).toString(16),
             order,
         }
