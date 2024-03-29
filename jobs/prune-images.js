@@ -10,13 +10,13 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 )
 
-const selfhostedMakers = ['alpha-keycaps', 'gooey-keys']
+const scrapers = ['alpha-keycaps', 'gooey-keys']
 
 const getColorways = async (rows = []) => {
     const { data } = await supabase
         .from('colorways')
         .select('img')
-        .not('maker_id', 'in', `(${selfhostedMakers.join()})`)
+        .not('maker_id', 'in', `(${scrapers.join()})`)
         .neq('img', '')
         .order('id')
         .range(rows.length, rows.length + 999)

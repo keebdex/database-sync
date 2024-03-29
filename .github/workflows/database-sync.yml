@@ -46,7 +46,7 @@ jobs:
       run: yarn google-sync
 
     - name: Sync from maker website/api
-      run: yarn selfhosted-sync
+      run: yarn scrapers-sync
 
     - name: Sync new keycaps
       run: yarn sync-keycaps

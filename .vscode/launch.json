@@ -14,8 +14,8 @@
             "type": "node"
         },
         {
-            "name": "Launch Self-Hosted Updater",
-            "program": "${workspaceFolder}/self-hosted.js",
+            "name": "Launch Scrapers",
+            "program": "${workspaceFolder}/scrapers.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
