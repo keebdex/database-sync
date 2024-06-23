@@ -23,7 +23,7 @@ jobs:
       CF_IMAGES_ACCOUNT_HASH: ${{ secrets.CF_IMAGES_ACCOUNT_HASH }}
 
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.1.7
     - name: Enable Corepack
       run: corepack enable
 
@@ -37,7 +37,7 @@ jobs:
       run: yarn install
 
     - name: Create Google service account key
-      uses: jsdaniell/create-json@v1.2.2
+      uses: jsdaniell/create-json@v1.2.3
       with:
         name: "keebtalogue.json"
         json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
