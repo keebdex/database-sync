@@ -22,8 +22,8 @@
   "homepage": "https://github.com/anhthang/keebtalogue-bridge#readme",
   "dependencies": {
     "@googleapis/docs": "^3.0.2",
-    "@googleapis/drive": "^8.10.0",
-    "@supabase/supabase-js": "^2.43.5",
+    "@googleapis/drive": "^8.11.0",
+    "@supabase/supabase-js": "^2.44.4",
     "axios": "^1.7.2",
     "bluebird": "^3.7.2",
     "crc": "^4.3.2",

@@ -36,7 +36,8 @@ function customMerge(key) {
 async function scan(maker) {
     console.log('start downloading:', maker.id)
 
-    let { id, document_ids, contributors = [] } = maker
+    const { id, document_ids } = maker
+    let contributors = maker.contributors || []
 
     try {
         const files = await Promise.all(document_ids.map(downloadDoc))
