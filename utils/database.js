@@ -14,8 +14,8 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 const sculptTable = 'sculpts'
 const colorwayTable = 'colorways'
 
-const makeColorwayKey = (c) => {
-    return [
+const makeColorwayKey = (c, withoutOrder = false) => {
+    let values = [
         c.maker_id,
         c.sculpt_id,
         c.colorway_id,
@@ -26,8 +26,13 @@ const makeColorwayKey = (c) => {
         c.qty,
         c.photo_credit,
         c.img,
-        c.order,
-    ].join()
+    ]
+
+    if (!withoutOrder) {
+        values.push(c.order)
+    }
+
+    return values.join()
 }
 
 const makeColorwayOrder = (c) => `${c.maker_id}-${c.sculpt_id}-${c.order}`
@@ -192,17 +197,20 @@ const updateMakerDatabase = async (tables) => {
     const colorways = flatten(map(tables, 'colorways'))
     const storedColorways = await getColorways(maker_id)
 
-    const incomingKeys = colorways.map(makeColorwayKey)
-    const existedKeys = storedColorways.map(makeColorwayKey)
+    const incomingKeys = colorways.map((c) => makeColorwayKey(c, false))
+    const existedKeys = storedColorways.map((c) => makeColorwayKey(c, false))
+    const existedKeysWithoutOrder = storedColorways.map((c) =>
+        makeColorwayKey(c, true)
+    )
 
     const newKeys = difference(incomingKeys, existedKeys)
     const changedKeys = difference(existedKeys, incomingKeys)
 
     const tobeInserted = colorways.filter((c) =>
-        newKeys.includes(makeColorwayKey(c))
+        newKeys.includes(makeColorwayKey(c, false))
     )
     const tobeUpdated = storedColorways.filter((c) =>
-        changedKeys.includes(makeColorwayKey(c))
+        changedKeys.includes(makeColorwayKey(c, false))
     )
 
     const insertingMap = keyBy(tobeInserted, makeColorwayOrder)
@@ -213,12 +221,30 @@ const updateMakerDatabase = async (tables) => {
 
     tobeUpdated.forEach((c) => {
         const key = makeColorwayOrder(c)
-        if (insertingMap[key]) {
-            const { remote_img, ...rest } = insertingMap[key]
-            updateClw[`${c.id}__${c.colorway_id}`] = rest
+        const keyWithoutOrder = makeColorwayKey(c, true)
 
-            if (c.colorway_id !== rest.colorway_id) {
-                outdatedImages.push(makeImageId(c))
+        if (insertingMap[key]) {
+            /**
+             * check if the colorway is just changed the order
+             * by adding a new row before existing rows without changes
+             */
+            if (existedKeysWithoutOrder.includes(keyWithoutOrder)) {
+                const newOrder = colorways.find(
+                    (nc) =>
+                        nc.sculpt_id === c.sculpt_id &&
+                        nc.colorway_id === c.colorway_id
+                )
+                if (newOrder) {
+                    const { remote_img, ...rest } = newOrder
+                    updateClw[`${c.id}__${c.colorway_id}`] = rest
+                }
+            } else {
+                const { remote_img, ...rest } = insertingMap[key]
+
+                updateClw[`${c.id}__${c.colorway_id}`] = rest
+                if (c.colorway_id !== rest.colorway_id) {
+                    outdatedImages.push(makeImageId(c))
+                }
             }
 
             delete insertingMap[key]

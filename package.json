@@ -23,11 +23,11 @@
   "dependencies": {
     "@googleapis/docs": "^3.3.0",
     "@googleapis/drive": "^8.14.0",
-    "@supabase/supabase-js": "^2.45.4",
-    "axios": "^1.7.7",
+    "@supabase/supabase-js": "^2.46.1",
+    "axios": "^1.7.8",
     "bluebird": "^3.7.2",
     "crc": "^4.3.2",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "deepmerge": "^4.3.1",
     "dotenv": "^16.4.5",
     "ini": "^5.0.0",
@@ -35,5 +35,5 @@
     "slugify": "^1.6.6",
     "xpath-html": "^1.0.3"
   },
-  "packageManager": "yarn@4.1.1"
+  "packageManager": "yarn@4.5.3"
 }
