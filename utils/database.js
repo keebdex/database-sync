@@ -228,16 +228,14 @@ const updateMakerDatabase = async (tables) => {
              * check if the colorway is just changed the order
              * by adding a new row before existing rows without changes
              */
-            if (existedKeysWithoutOrder.includes(keyWithoutOrder)) {
-                const newOrder = colorways.find(
-                    (nc) =>
-                        nc.sculpt_id === c.sculpt_id &&
-                        nc.colorway_id === c.colorway_id
-                )
-                if (newOrder) {
-                    const { remote_img, ...rest } = newOrder
-                    updateClw[`${c.id}__${c.colorway_id}`] = rest
-                }
+            const hasItem = colorways.find(
+                (nc) =>
+                    nc.sculpt_id === c.sculpt_id &&
+                    nc.colorway_id === c.colorway_id
+            )
+            if (existedKeysWithoutOrder.includes(keyWithoutOrder) && hasItem) {
+                const { remote_img, ...rest } = hasItem
+                updateClw[`${c.id}__${c.colorway_id}`] = rest
             } else {
                 const { remote_img, ...rest } = insertingMap[key]
 
