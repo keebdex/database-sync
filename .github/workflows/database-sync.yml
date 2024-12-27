@@ -23,12 +23,12 @@ jobs:
       CF_IMAGES_ACCOUNT_HASH: ${{ secrets.CF_IMAGES_ACCOUNT_HASH }}
 
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@v4.2.2
     - name: Enable Corepack
       run: corepack enable
 
     - name: Use Node.js 20.x
-      uses: actions/setup-node@v4.0.2
+      uses: actions/setup-node@v4.1.0
       with:
         node-version: 20
         cache: 'yarn'
