@@ -275,7 +275,27 @@ const updateMakerDatabase = async (tables) => {
     }
 
     if (deletedRows.length) {
-        await deleteRows(colorwayTable, 'id', deletedRows)
+        const slatedItems = await supabase
+            .from('user_collection_items')
+            .select('artisan_item_id')
+            .in('artisan_item_id', deleteRows)
+            .then(({ data }) => data.map((r) => r.artisan_item_id))
+
+        // marked for deletion are added to user collections for later removal
+        await Promise.map(
+            slatedItems,
+            async (id) => {
+                await updateRow(colorwayTable, id, { deleted: true })
+            },
+            { concurrency: 1 }
+        )
+
+        // deleting colorways does not add them to any collections
+        await deleteRows(
+            colorwayTable,
+            'id',
+            deletedRows.filter((id) => !slatedItems.includes(id))
+        )
 
         console.log('colorways deleted', outdatedImages.length)
     }
