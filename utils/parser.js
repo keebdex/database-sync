@@ -2,15 +2,17 @@ const { format, parse } = require('date-fns')
 const { chunk, flatten, findLast, get, keyBy } = require('lodash')
 const { urlSlugify } = require('./slugify')
 
-const regRelease = /\(([a-zA-Z0-9 ]*\d{4})\)/gim
-const jellyReg = /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim
-const dreadkeysCommission = /\(Commission\)|\(Comission\)/gim
-
-const regQty = /\(count (\d+)\)/gim
-const regCommission = /\(\*\)/gim
-const regGiveaway = /\(giveaway\)|\(give-away\)/gim
-const regPhotoCredit = /\(pc (.*)\)/gim
-const regArtisanKeycap = /artisan keycaps|artisan keycap/gim
+const regex = {
+    artisan_keycap: /artisan keycaps|artisan keycap/gim,
+    commission_dreadkeys: /\(commission\)|\(comission\)/gim,
+    commission: /\(\*\)/gim,
+    giveaway: /\(giveaway\)|\(give-away\)|\(discord giveaway\)/gim,
+    oneoff: /\(oneoff\)|\(one-off\)|\(1\/1\)/gim,
+    photo_credit: /\(pc (.*)\)/gim,
+    qty: /\(count (\d+)\)/gim,
+    release_jelly_key: /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim,
+    release: /\(([a-zA-Z0-9 ]*\d{4})\)/gim,
+}
 
 const attrs = {
     profile: {
@@ -62,14 +64,14 @@ const parseSculpt = (table, maker_id) => {
         img: null,
     }
 
-    let releaseMatch = regRelease.exec(text) || regRelease.exec(subtext)
+    let releaseMatch = regex.release.exec(text) || regex.release.exec(subtext)
     if (releaseMatch) {
         sculpt.release = releaseMatch[1]
-        text = text.replace(regRelease, '')
+        text = text.replace(regex.release, '')
     }
 
     if (maker_id === 'jelly-key') {
-        const dateMatch = jellyReg.exec(text)
+        const dateMatch = regex.release_jelly_key.exec(text)
         if (dateMatch) {
             try {
                 sculpt.release = format(
@@ -82,12 +84,12 @@ const parseSculpt = (table, maker_id) => {
                     'dd MMM yyyy'
                 )
             }
-            text = text.replace(jellyReg, '')
+            text = text.replace(regex.release_jelly_key, '')
         }
 
-        const endsWith = regArtisanKeycap.exec(text)
+        const endsWith = regex.artisan_keycap.exec(text)
         if (endsWith) {
-            text = text.replace(regArtisanKeycap, '')
+            text = text.replace(regex.artisan_keycap, '')
         }
     }
 
@@ -164,34 +166,40 @@ const parser = (document, maker_id) => {
 
             let text = texts.join(' ')
 
-            const releaseMatch = regRelease.exec(text)
+            const releaseMatch = regex.release.exec(text)
             if (releaseMatch) {
                 colorway.release = releaseMatch[1]
-                text = text.replace(regRelease, '')
+                text = text.replace(regex.release, '')
             }
 
-            const qtyMatch = regQty.exec(text)
+            const qtyMatch = regex.qty.exec(text)
             if (qtyMatch) {
                 colorway.qty = Number(qtyMatch[1])
-                text = text.replace(regQty, '')
+                text = text.replace(regex.qty, '')
             }
 
-            const commissionMatch = regCommission.exec(text)
+            const oneoffMatch = regex.oneoff.exec(text)
+            if (oneoffMatch) {
+                colorway.qty = 1
+                text = text.replace(regex.giveaway, '')
+            }
+
+            const commissionMatch = regex.commission.exec(text)
             if (commissionMatch) {
                 colorway.commissioned = true
-                text = text.replace(regCommission, '')
+                text = text.replace(regex.commission, '')
             }
 
-            const giveawayMatch = regGiveaway.exec(text)
+            const giveawayMatch = regex.giveaway.exec(text)
             if (giveawayMatch) {
                 colorway.giveaway = true
-                text = text.replace(regGiveaway, '')
+                text = text.replace(regex.giveaway, '')
             }
 
-            const photoCreditMatch = regPhotoCredit.exec(text)
+            const photoCreditMatch = regex.photo_credit.exec(text)
             if (photoCreditMatch) {
                 colorway.photo_credit = photoCreditMatch[1]
-                text = text.replace(regPhotoCredit, '')
+                text = text.replace(regex.photo_credit, '')
             }
 
             if (maker_id === 'fraktal-kaps') {
@@ -222,10 +230,10 @@ const parser = (document, maker_id) => {
             }
 
             if (maker_id === 'dreadkeys') {
-                const isCommission = dreadkeysCommission.exec(text)
+                const isCommission = regex.commission_dreadkeys.exec(text)
                 if (isCommission) {
                     colorway.commissioned = true
-                    text = text.replace(dreadkeysCommission, '')
+                    text = text.replace(regex.commission_dreadkeys, '')
                 }
             }
 
