@@ -181,7 +181,7 @@ const parser = (document, maker_id) => {
             const oneoffMatch = regex.oneoff.exec(text)
             if (oneoffMatch) {
                 colorway.qty = 1
-                text = text.replace(regex.giveaway, '')
+                text = text.replace(regex.oneoff, '')
             }
 
             const commissionMatch = regex.commission.exec(text)
