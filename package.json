@@ -1,5 +1,5 @@
 {
-  "name": "keebtalogue-bridge",
+  "name": "keebtalogue-database-sync",
   "version": "1.0.0",
   "description": "Automates the extraction and transformation of keycap data from both your Google Docs files and official maker websites/APIs. It then seamlessly migrates everything into a centralized database, making your precious keycap collection easily searchable, organized, and manageable.",
   "main": "index.js",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anhthang/keebtalogue-bridge.git"
+    "url": "git+https://github.com/anhthang/keebtalogue-database-sync.git"
   },
   "author": "Anh Thang Bui <buianhthang89@gmail.com> (https://anhthang.org)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/anhthang/keebtalogue-bridge/issues"
+    "url": "https://github.com/anhthang/keebtalogue-database-sync/issues"
   },
-  "homepage": "https://github.com/anhthang/keebtalogue-bridge#readme",
+  "homepage": "https://github.com/anhthang/keebtalogue-database-sync#readme",
   "dependencies": {
     "@googleapis/docs": "^3.3.0",
     "@googleapis/drive": "^8.14.0",
@@ -35,5 +35,5 @@
     "slugify": "^1.6.6",
     "xpath-html": "^1.0.3"
   },
-  "packageManager": "yarn@4.5.3"
+  "packageManager": "yarn@4.6.0"
 }

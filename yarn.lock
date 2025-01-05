@@ -487,9 +487,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keebtalogue-bridge@workspace:.":
+"keebtalogue-database-sync@workspace:.":
   version: 0.0.0-use.local
-  resolution: "keebtalogue-bridge@workspace:."
+  resolution: "keebtalogue-database-sync@workspace:."
   dependencies:
     "@googleapis/docs": "npm:^3.3.0"
     "@googleapis/drive": "npm:^8.14.0"
