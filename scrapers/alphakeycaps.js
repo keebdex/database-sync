@@ -7,6 +7,8 @@ const { urlSlugify } = require('../utils/slugify')
 const baseUrl = 'https://alphakeycaps.com'
 const maker_id = 'alpha-keycaps'
 
+const topre = '(T)'
+
 const sculptScraper = async (sculpt_id, sculpt_name) => {
     const { data } = await axios({
         method: 'get',
@@ -22,19 +24,26 @@ const sculptScraper = async (sculpt_id, sculpt_name) => {
             .findElement('//img')
             .getAttribute('data-src')
 
-        const name = text.replace(sculpt_name, '').trim()
+        let name = text.replace(sculpt_name, '')
+        let stem = null
+
+        if (name.includes(topre)) {
+            stem = ['topre']
+            name = name.replace(topre, '')
+        }
 
         return {
-            name,
+            name: name.trim(),
             img,
             maker_id,
             sculpt_id,
             giveaway: false,
             commissioned: false,
             colorway_id: crc32(
-                `${maker_id}-${sculpt_id}-${urlSlugify(name)}-${order}`
+                `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
             ).toString(16),
             order,
+            stem,
         }
     })
 }
@@ -57,7 +66,7 @@ const catalogs = [
     'Devoura',
     'Lickely',
     'Tut',
-    'Tutré'
+    'Tutré',
 ]
 
 const scraper = async () => {

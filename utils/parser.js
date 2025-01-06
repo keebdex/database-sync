@@ -12,6 +12,7 @@ const regex = {
     qty: /\(count (\d+)\)/gim,
     release_jelly_key: /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim,
     release: /\(([a-zA-Z0-9 ]*\d{4})\)/gim,
+    stem: /\(stemtype\s+((?:topre|mx|alps|tmx|choc|bs)(?:\s+(?:topre|mx|alps|tmx|choc|bs))*)\b\)/gim,
 }
 
 const attrs = {
@@ -139,6 +140,7 @@ const parser = (document, maker_id) => {
                 release: null,
                 qty: null,
                 photo_credit: null,
+                stem: null,
                 order,
             }
 
@@ -200,6 +202,13 @@ const parser = (document, maker_id) => {
             if (photoCreditMatch) {
                 colorway.photo_credit = photoCreditMatch[1]
                 text = text.replace(regex.photo_credit, '')
+            }
+
+            const stemMatch = regex.stem.exec(text)
+            if (stemMatch) {
+                const stemTypes = stemMatch[1].split(' ')
+                colorway.stem = stemTypes
+                text = text.replace(regex.stem, '')
             }
 
             if (maker_id === 'fraktal-kaps') {
