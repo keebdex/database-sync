@@ -26,6 +26,7 @@ const makeColorwayKey = (c) => {
         c.qty,
         c.photo_credit,
         c.img,
+        c.stem && c.stem.sort().join('-')
     ].join()
 }
 
