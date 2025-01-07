@@ -43,6 +43,14 @@ const normalize = (text) => {
         .trim()
 }
 
+const normalizeDate = (text) => {
+    try {
+        return format(parse(text, 'MMMM yyyy', new Date()), 'MMM yyyy')
+    } catch (error) {
+        return text
+    }
+}
+
 const parseSculpt = (table, maker_id) => {
     let [titleNodes, attrNodes] = table.table.tableRows[0].tableCells[0].content
 
@@ -67,7 +75,7 @@ const parseSculpt = (table, maker_id) => {
 
     let releaseMatch = regex.release.exec(text) || regex.release.exec(subtext)
     if (releaseMatch) {
-        sculpt.release = releaseMatch[1]
+        sculpt.release = normalizeDate(releaseMatch[1].trim())
         text = text.replace(regex.release, '')
     }
 
@@ -170,7 +178,7 @@ const parser = (document, maker_id) => {
 
             const releaseMatch = regex.release.exec(text)
             if (releaseMatch) {
-                colorway.release = releaseMatch[1]
+                colorway.release = normalizeDate(releaseMatch[1].trim())
                 text = text.replace(regex.release, '')
             }
 
