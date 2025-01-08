@@ -13,6 +13,7 @@ const regex = {
     release_jelly_key: /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim,
     release: /\(([a-zA-Z0-9 ]*\d{4})\)/gim,
     stem: /\(stemtype\s+((?:topre|mx|alps|tmx|choc|bs)(?:\s+(?:topre|mx|alps|tmx|choc|bs))*)\b\)/gim,
+    stem_sculpt: /\((topre|mx|alps|tmx|choc|bs)\)/gim,
 }
 
 const attrs = {
@@ -115,10 +116,18 @@ const parseSculpt = (table, maker_id) => {
         })
     })
 
+    // try parse stem from the sculpt name and assign to all colorways
+    let stem = null
+    const stemMatch = regex.stem_sculpt.exec(text)
+    if (stemMatch) {
+        stem = [stemMatch[1].toLowerCase()]
+        text = text.replace(regex.stem_sculpt, '')
+    }
+
     sculpt.name = normalize(text)
     sculpt.sculpt_id = urlSlugify(sculpt.name)
 
-    return sculpt
+    return { sculpt, stem }
 }
 
 const parser = (document, maker_id) => {
@@ -128,7 +137,7 @@ const parser = (document, maker_id) => {
     const sculpts = chunks.map((chunk) => {
         if (chunk.length === 1) return null
 
-        const sculpt = parseSculpt(chunk[0], maker_id)
+        const { sculpt, stem } = parseSculpt(chunk[0], maker_id)
 
         const colorways = []
 
@@ -148,7 +157,7 @@ const parser = (document, maker_id) => {
                 release: null,
                 qty: null,
                 photo_credit: null,
-                stem: null,
+                stem,
                 order,
             }
 

@@ -23,7 +23,7 @@
   "dependencies": {
     "@googleapis/docs": "^3.3.0",
     "@googleapis/drive": "^8.14.0",
-    "@supabase/supabase-js": "^2.47.10",
+    "@supabase/supabase-js": "^2.47.11",
     "axios": "^1.7.9",
     "bluebird": "^3.7.2",
     "crc": "^4.3.2",
