@@ -16,6 +16,15 @@ const regex = {
     stem_sculpt: /\((topre|mx|alps|tmx|choc|bs)\)/gim,
 }
 
+const stemMap = {
+    topre: 'Topre',
+    mx: 'MX',
+    alps: 'Alps',
+    tmx: 'TMX',
+    choc: 'Choc',
+    bs: 'BS'
+}
+
 const attrs = {
     profile: {
         sculpted: '(ka_profile_sculpt)',
@@ -51,6 +60,8 @@ const normalizeDate = (text) => {
         return text
     }
 }
+
+const normalizeStem = (text) => stemMap[text.toLowerCase()] || text.toLowerCase()
 
 const parseSculpt = (table, maker_id) => {
     let [titleNodes, attrNodes] = table.table.tableRows[0].tableCells[0].content
@@ -120,7 +131,7 @@ const parseSculpt = (table, maker_id) => {
     let stem = null
     const stemMatch = regex.stem_sculpt.exec(text)
     if (stemMatch) {
-        stem = [stemMatch[1].toLowerCase()]
+        stem = [normalizeStem(stemMatch[1])]
         text = text.replace(regex.stem_sculpt, '')
     }
 
@@ -224,7 +235,7 @@ const parser = (document, maker_id) => {
             const stemMatch = regex.stem.exec(text)
             if (stemMatch) {
                 const stemTypes = stemMatch[1].split(' ')
-                colorway.stem = stemTypes
+                colorway.stem = stemTypes.map(normalizeStem)
                 text = text.replace(regex.stem, '')
             }
 

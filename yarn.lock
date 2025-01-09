@@ -50,12 +50,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/postgrest-js@npm:1.17.9":
-  version: 1.17.9
-  resolution: "@supabase/postgrest-js@npm:1.17.9"
+"@supabase/postgrest-js@npm:1.17.10":
+  version: 1.17.10
+  resolution: "@supabase/postgrest-js@npm:1.17.10"
   dependencies:
     "@supabase/node-fetch": "npm:^2.6.14"
-  checksum: 10c0/0cc2d79115cba76fbfd34e90e80302aaee93cc125f54b2886228c59b5bfac1cd0b6ac4b6ebdd41899c828fee8d725b85592ed371a4ff598488fb35d45c86b38c
+  checksum: 10c0/b2f2d4fbdb2476bc8e58f6d466678aae6ee8f2464774872060044203659ff6b020e930b89c2135e3d5ae1e63fc33887e1424c7309a29f443c88f6e25a7271f32
   languageName: node
   linkType: hard
 
@@ -80,17 +80,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/supabase-js@npm:^2.47.11":
-  version: 2.47.11
-  resolution: "@supabase/supabase-js@npm:2.47.11"
+"@supabase/supabase-js@npm:^2.47.12":
+  version: 2.47.12
+  resolution: "@supabase/supabase-js@npm:2.47.12"
   dependencies:
     "@supabase/auth-js": "npm:2.67.3"
     "@supabase/functions-js": "npm:2.4.4"
     "@supabase/node-fetch": "npm:2.6.15"
-    "@supabase/postgrest-js": "npm:1.17.9"
+    "@supabase/postgrest-js": "npm:1.17.10"
     "@supabase/realtime-js": "npm:2.11.2"
     "@supabase/storage-js": "npm:2.7.1"
-  checksum: 10c0/00a3358b3fb4a74b8a10d5c01daae75ab548e087584061bd568830ac480907be9b96b21ac7bf345fa957383debd4f762db67a1b0d34e4ac67f5836d8600713f3
+  checksum: 10c0/ab796bbdf1887cdc1c3d8a315a56d1075b453ad6418fdf673c8fc53757ab0e16365f055347f8d447ce75925d695c100515d2617f670cb820aca2600794ba1b90
   languageName: node
   linkType: hard
 
@@ -503,7 +503,7 @@ __metadata:
   dependencies:
     "@googleapis/docs": "npm:^3.3.0"
     "@googleapis/drive": "npm:^8.14.0"
-    "@supabase/supabase-js": "npm:^2.47.11"
+    "@supabase/supabase-js": "npm:^2.47.12"
     axios: "npm:^1.7.9"
     bluebird: "npm:^3.7.2"
     crc: "npm:^4.3.2"

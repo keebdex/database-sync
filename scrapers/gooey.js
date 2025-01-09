@@ -2,8 +2,17 @@ const axios = require('axios')
 const { crc32 } = require('crc')
 const { findLast } = require('lodash')
 const { urlSlugify } = require('../utils/slugify')
+const { format, parse } = require('date-fns')
 
 const maker_id = 'gooey-keys'
+
+const normalizeDate = (text) => {
+    try {
+        return format(parse(text, 'MMMM yyyy', new Date()), 'MMM yyyy')
+    } catch (error) {
+        return text
+    }
+}
 
 const scraper = async () => {
     const { data } = await axios({
@@ -15,14 +24,14 @@ const scraper = async () => {
         const sculpt_id = urlSlugify(sculpt.name)
 
         const colorways = sculpt.colorways.map((colorway, order) => {
-            const { name, img, releaseDate: release } = colorway
+            const { name, img, releaseDate } = colorway
 
             return {
                 name,
                 img,
                 maker_id,
                 sculpt_id,
-                release,
+                release: normalizeDate(releaseDate),
                 giveaway: false,
                 commissioned: false,
                 colorway_id: crc32(
@@ -34,7 +43,7 @@ const scraper = async () => {
 
         return {
             name: sculpt.name,
-            release: sculpt.releaseDate,
+            release: normalizeDate(sculpt.releaseDate),
             colorways,
             maker_id,
             sculpt_id,
