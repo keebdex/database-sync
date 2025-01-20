@@ -50,12 +50,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/postgrest-js@npm:1.17.10":
-  version: 1.17.10
-  resolution: "@supabase/postgrest-js@npm:1.17.10"
+"@supabase/postgrest-js@npm:1.18.0":
+  version: 1.18.0
+  resolution: "@supabase/postgrest-js@npm:1.18.0"
   dependencies:
     "@supabase/node-fetch": "npm:^2.6.14"
-  checksum: 10c0/b2f2d4fbdb2476bc8e58f6d466678aae6ee8f2464774872060044203659ff6b020e930b89c2135e3d5ae1e63fc33887e1424c7309a29f443c88f6e25a7271f32
+  checksum: 10c0/eea5ac90a778f59c29c79c77b52716810685eb2bc796eaab826e2dc3574726de083be17a8568485c62654d922ea614e1b7a609936e0a58c09436da933f60dd2b
   languageName: node
   linkType: hard
 
@@ -80,26 +80,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/supabase-js@npm:^2.47.12":
-  version: 2.47.12
-  resolution: "@supabase/supabase-js@npm:2.47.12"
+"@supabase/supabase-js@npm:^2.48.0":
+  version: 2.48.0
+  resolution: "@supabase/supabase-js@npm:2.48.0"
   dependencies:
     "@supabase/auth-js": "npm:2.67.3"
     "@supabase/functions-js": "npm:2.4.4"
     "@supabase/node-fetch": "npm:2.6.15"
-    "@supabase/postgrest-js": "npm:1.17.10"
+    "@supabase/postgrest-js": "npm:1.18.0"
     "@supabase/realtime-js": "npm:2.11.2"
     "@supabase/storage-js": "npm:2.7.1"
-  checksum: 10c0/ab796bbdf1887cdc1c3d8a315a56d1075b453ad6418fdf673c8fc53757ab0e16365f055347f8d447ce75925d695c100515d2617f670cb820aca2600794ba1b90
+  checksum: 10c0/a3529e6ac66c14d860e8ddbe9a51b89f1885494829474d3ec770218f100c2216493c76e5cc4da5cff3ec0ea496b66f62bc4a25e4eae3445ef5f3e7fa210fd193
   languageName: node
   linkType: hard
 
 "@types/node@npm:*":
-  version: 22.10.5
-  resolution: "@types/node@npm:22.10.5"
+  version: 22.10.7
+  resolution: "@types/node@npm:22.10.7"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/6a0e7d1fe6a86ef6ee19c3c6af4c15542e61aea2f4cee655b6252efb356795f1f228bc8299921e82924e80ff8eca29b74d9dd0dd5cc1a90983f892f740b480df
+  checksum: 10c0/c941b4689dfc4044b64a5f601306cbcb0c7210be853ba378a5dd44137898c45accedd796ee002ad9407024cac7ecaf5049304951cb1d80ce3d7cebbbae56f20e
   languageName: node
   linkType: hard
 
@@ -288,11 +288,11 @@ __metadata:
   linkType: hard
 
 "es-object-atoms@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "es-object-atoms@npm:1.0.0"
+  version: 1.1.1
+  resolution: "es-object-atoms@npm:1.1.1"
   dependencies:
     es-errors: "npm:^1.3.0"
-  checksum: 10c0/1fed3d102eb27ab8d983337bb7c8b159dd2a1e63ff833ec54eea1311c96d5b08223b433060ba240541ca8adba9eee6b0a60cdbf2f80634b784febc9cc8b687b4
+  checksum: 10c0/65364812ca4daf48eb76e2a3b7a89b3f6a2e62a1c420766ce9f692665a29d94fe41fe88b65f24106f449859549711e4b40d9fb8002d862dfd7eb1c512d10be0c
   languageName: node
   linkType: hard
 
@@ -503,7 +503,7 @@ __metadata:
   dependencies:
     "@googleapis/docs": "npm:^3.3.0"
     "@googleapis/drive": "npm:^8.14.0"
-    "@supabase/supabase-js": "npm:^2.47.12"
+    "@supabase/supabase-js": "npm:^2.48.0"
     axios: "npm:^1.7.9"
     bluebird: "npm:^3.7.2"
     crc: "npm:^4.3.2"
@@ -597,11 +597,11 @@ __metadata:
   linkType: hard
 
 "qs@npm:^6.7.0":
-  version: 6.13.1
-  resolution: "qs@npm:6.13.1"
+  version: 6.14.0
+  resolution: "qs@npm:6.14.0"
   dependencies:
-    side-channel: "npm:^1.0.6"
-  checksum: 10c0/5ef527c0d62ffca5501322f0832d800ddc78eeb00da3b906f1b260ca0492721f8cdc13ee4b8fd8ac314a6ec37b948798c7b603ccc167e954088df392092f160c
+    side-channel: "npm:^1.1.0"
+  checksum: 10c0/8ea5d91bf34f440598ee389d4a7d95820e3b837d3fd9f433871f7924801becaa0cd3b3b4628d49a7784d06a8aea9bc4554d2b6d8d584e2d221dc06238a42909c
   languageName: node
   linkType: hard
 
@@ -647,7 +647,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"side-channel@npm:^1.0.6":
+"side-channel@npm:^1.1.0":
   version: 1.1.0
   resolution: "side-channel@npm:1.1.0"
   dependencies:

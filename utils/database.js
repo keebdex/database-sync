@@ -276,15 +276,15 @@ const updateMakerDatabase = async (tables) => {
     }
 
     if (deletedRows.length) {
-        const slatedItems = await supabase
+        const outdatedItems = await supabase
             .from('user_collection_items')
             .select('artisan_item_id')
-            .in('artisan_item_id', deleteRows)
+            .in('artisan_item_id', deletedRows)
             .then(({ data }) => data.map((r) => r.artisan_item_id))
 
         // marked for deletion are added to user collections for later removal
         await Promise.map(
-            slatedItems,
+            outdatedItems,
             async (id) => {
                 await updateRow(colorwayTable, id, { deleted: true })
             },
@@ -295,7 +295,7 @@ const updateMakerDatabase = async (tables) => {
         await deleteRows(
             colorwayTable,
             'id',
-            deletedRows.filter((id) => !slatedItems.includes(id))
+            deletedRows.filter((id) => !outdatedItems.includes(id))
         )
 
         console.log('colorways deleted', outdatedImages.length)
