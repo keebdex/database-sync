@@ -14,8 +14,8 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 const sculptTable = 'sculpts'
 const colorwayTable = 'colorways'
 
-const makeColorwayKey = (c) => {
-    return [
+const makeColorwayKey = (c, withOrder) => {
+    const keys = [
         c.maker_id,
         c.sculpt_id,
         c.colorway_id,
@@ -26,8 +26,14 @@ const makeColorwayKey = (c) => {
         c.qty,
         c.photo_credit,
         c.img,
-        c.stem && c.stem.sort().join('-')
-    ].join()
+        c.stem && c.stem.sort().join('-'),
+    ]
+
+    if (withOrder) {
+        keys.push(c.order)
+    }
+
+    return keys.join()
 }
 
 const makeKeyByColorwayId = (c) =>
@@ -194,17 +200,17 @@ const updateMakerDatabase = async (tables) => {
     const colorways = flatten(map(tables, 'colorways'))
     const storedColorways = await getColorways(maker_id)
 
-    const incomingKeys = colorways.map(makeColorwayKey)
-    const existedKeys = storedColorways.map(makeColorwayKey)
+    const incomingKeys = colorways.map((c) => makeColorwayKey(c, true))
+    const existedKeys = storedColorways.map((c) => makeColorwayKey(c, true))
 
     const newKeys = difference(incomingKeys, existedKeys)
     const changedKeys = difference(existedKeys, incomingKeys)
 
     const tobeInserted = colorways.filter((c) =>
-        newKeys.includes(makeColorwayKey(c))
+        newKeys.includes(makeColorwayKey(c, true))
     )
     const tobeUpdated = storedColorways.filter((c) =>
-        changedKeys.includes(makeColorwayKey(c))
+        changedKeys.includes(makeColorwayKey(c, true))
     )
 
     const insertingMapByColorwayId = keyBy(tobeInserted, makeKeyByColorwayId)
