@@ -67,6 +67,7 @@ const catalogs = [
     'Lickely',
     'Tut',
     'Tutré',
+    'Pintut',
 ]
 
 const scraper = async () => {

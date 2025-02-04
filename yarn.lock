@@ -50,12 +50,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/postgrest-js@npm:1.18.0":
-  version: 1.18.0
-  resolution: "@supabase/postgrest-js@npm:1.18.0"
+"@supabase/postgrest-js@npm:1.18.1":
+  version: 1.18.1
+  resolution: "@supabase/postgrest-js@npm:1.18.1"
   dependencies:
     "@supabase/node-fetch": "npm:^2.6.14"
-  checksum: 10c0/eea5ac90a778f59c29c79c77b52716810685eb2bc796eaab826e2dc3574726de083be17a8568485c62654d922ea614e1b7a609936e0a58c09436da933f60dd2b
+  checksum: 10c0/63b28ffec4ff2d5d5c84e657dc67d454f79389b8a42c4d5e1a2a0091d49fb44c5f3ecac2cca77cc24cb734d10a1a19cf017ec39e14daec8caef5b365f73ee738
   languageName: node
   linkType: hard
 
@@ -80,26 +80,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/supabase-js@npm:^2.48.0":
-  version: 2.48.0
-  resolution: "@supabase/supabase-js@npm:2.48.0"
+"@supabase/supabase-js@npm:^2.48.1":
+  version: 2.48.1
+  resolution: "@supabase/supabase-js@npm:2.48.1"
   dependencies:
     "@supabase/auth-js": "npm:2.67.3"
     "@supabase/functions-js": "npm:2.4.4"
     "@supabase/node-fetch": "npm:2.6.15"
-    "@supabase/postgrest-js": "npm:1.18.0"
+    "@supabase/postgrest-js": "npm:1.18.1"
     "@supabase/realtime-js": "npm:2.11.2"
     "@supabase/storage-js": "npm:2.7.1"
-  checksum: 10c0/a3529e6ac66c14d860e8ddbe9a51b89f1885494829474d3ec770218f100c2216493c76e5cc4da5cff3ec0ea496b66f62bc4a25e4eae3445ef5f3e7fa210fd193
+  checksum: 10c0/af0d7df273e416f7a34813f17bf37efe55455e21683a5d4a8a4baa739018589e9455539e1793804cb100d511adcdf5f4314944d025b2c3bfddfab53da9cd7dac
   languageName: node
   linkType: hard
 
 "@types/node@npm:*":
-  version: 22.10.7
-  resolution: "@types/node@npm:22.10.7"
+  version: 22.13.1
+  resolution: "@types/node@npm:22.13.1"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/c941b4689dfc4044b64a5f601306cbcb0c7210be853ba378a5dd44137898c45accedd796ee002ad9407024cac7ecaf5049304951cb1d80ce3d7cebbbae56f20e
+  checksum: 10c0/d4e56d41d8bd53de93da2651c0a0234e330bd7b1b6d071b1a94bd3b5ee2d9f387519e739c52a15c1faa4fb9d97e825b848421af4b2e50e6518011e7adb4a34b7
   languageName: node
   linkType: hard
 
@@ -111,11 +111,11 @@ __metadata:
   linkType: hard
 
 "@types/ws@npm:^8.5.10":
-  version: 8.5.13
-  resolution: "@types/ws@npm:8.5.13"
+  version: 8.5.14
+  resolution: "@types/ws@npm:8.5.14"
   dependencies:
     "@types/node": "npm:*"
-  checksum: 10c0/a5430aa479bde588e69cb9175518d72f9338b6999e3b2ae16fc03d3bdcff8347e486dc031e4ed14601260463c07e1f9a0d7511dfc653712b047c439c680b0b34
+  checksum: 10c0/be88a0b6252f939cb83340bd1b4d450287f752c19271195cd97564fd94047259a9bb8c31c585a61b69d8a1b069a99df9dd804db0132d3359c54d3890c501416a
   languageName: node
   linkType: hard
 
@@ -345,12 +345,13 @@ __metadata:
   linkType: hard
 
 "gcp-metadata@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "gcp-metadata@npm:6.1.0"
+  version: 6.1.1
+  resolution: "gcp-metadata@npm:6.1.1"
   dependencies:
-    gaxios: "npm:^6.0.0"
+    gaxios: "npm:^6.1.1"
+    google-logging-utils: "npm:^0.0.2"
     json-bigint: "npm:^1.0.0"
-  checksum: 10c0/0f84f8c0b974e79d0da0f3063023486e53d7982ce86c4b5871e4ee3b1fc4e7f76fcc05f6342aa0ded5023f1a499c21ab97743a498b31f3aa299905226d1f66ab
+  checksum: 10c0/71f6ad4800aa622c246ceec3955014c0c78cdcfe025971f9558b9379f4019f5e65772763428ee8c3244fa81b8631977316eaa71a823493f82e5c44d7259ffac8
   languageName: node
   linkType: hard
 
@@ -383,8 +384,8 @@ __metadata:
   linkType: hard
 
 "google-auth-library@npm:^9.7.0":
-  version: 9.15.0
-  resolution: "google-auth-library@npm:9.15.0"
+  version: 9.15.1
+  resolution: "google-auth-library@npm:9.15.1"
   dependencies:
     base64-js: "npm:^1.3.0"
     ecdsa-sig-formatter: "npm:^1.0.11"
@@ -392,7 +393,14 @@ __metadata:
     gcp-metadata: "npm:^6.1.0"
     gtoken: "npm:^7.0.0"
     jws: "npm:^4.0.0"
-  checksum: 10c0/f5a9a46e939147b181bac9b254f11dd8c2d05c15a65c9d3f2180252bef21c12af37d9893bc3caacafd226d6531a960535dbb5222ef869143f393c6a97639cc06
+  checksum: 10c0/6eef36d9a9cb7decd11e920ee892579261c6390104b3b24d3e0f3889096673189fe2ed0ee43fd563710e2560de98e63ad5aa4967b91e7f4e69074a422d5f7b65
+  languageName: node
+  linkType: hard
+
+"google-logging-utils@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "google-logging-utils@npm:0.0.2"
+  checksum: 10c0/9a4bbd470dd101c77405e450fffca8592d1d7114f245a121288d04a957aca08c9dea2dd1a871effe71e41540d1bb0494731a0b0f6fea4358e77f06645e4268c1
   languageName: node
   linkType: hard
 
@@ -503,7 +511,7 @@ __metadata:
   dependencies:
     "@googleapis/docs": "npm:^3.3.0"
     "@googleapis/drive": "npm:^8.14.0"
-    "@supabase/supabase-js": "npm:^2.48.0"
+    "@supabase/supabase-js": "npm:^2.48.1"
     axios: "npm:^1.7.9"
     bluebird: "npm:^3.7.2"
     crc: "npm:^4.3.2"
