@@ -4,7 +4,7 @@ const path = require('path')
 
 const downloadDoc = async (documentId) => {
     const auth = new docs.auth.GoogleAuth({
-        keyFile: path.join(__dirname, '..', '/keebtalogue.json'),
+        keyFile: path.join(__dirname, '..', '/keebdex.json'),
         scopes: ['https://www.googleapis.com/auth/documents'],
     })
 
@@ -17,7 +17,7 @@ const downloadDoc = async (documentId) => {
 
 const getFile = async (fileId) => {
     const auth = new drive.auth.GoogleAuth({
-        keyFile: path.join(__dirname, '..', '/keebtalogue.json'),
+        keyFile: path.join(__dirname, '..', '/keebdex.json'),
         scopes: ['https://www.googleapis.com/auth/drive'],
     })
 
@@ -30,7 +30,7 @@ const getFile = async (fileId) => {
 
 const getRevisions = async (fileId, revisions = [], pageToken) => {
     const auth = new drive.auth.GoogleAuth({
-        keyFile: path.join(__dirname, '..', '/keebtalogue.json'),
+        keyFile: path.join(__dirname, '..', '/keebdex.json'),
         scopes: ['https://www.googleapis.com/auth/drive'],
     })
 

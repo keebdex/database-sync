@@ -1,4 +1,4 @@
-name: Keebtalogue Database Sync
+name: Keebdex Database Sync
 
 on:
   workflow_dispatch:
@@ -39,7 +39,7 @@ jobs:
     - name: Create Google service account key
       uses: jsdaniell/create-json@v1.2.3
       with:
-        name: "keebtalogue.json"
+        name: "keebdex.json"
         json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
 
     - name: Sync from google docs

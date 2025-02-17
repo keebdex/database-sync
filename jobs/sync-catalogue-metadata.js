@@ -35,7 +35,7 @@ let existedIds = []
 
 const syncMetadata = async ({ maker_id, doc_id }) => {
     const auth = new drive.auth.GoogleAuth({
-        keyFile: path.join(__dirname, '..', '/keebtalogue.json'),
+        keyFile: path.join(__dirname, '..', '/keebdex.json'),
         scopes: ['https://www.googleapis.com/auth/drive'],
     })
 
