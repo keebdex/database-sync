@@ -22,7 +22,7 @@ const stemMap = {
     alps: 'Alps',
     tmx: 'TMX',
     choc: 'Choc',
-    bs: 'BS'
+    bs: 'BS',
 }
 
 const attrs = {
@@ -61,7 +61,8 @@ const normalizeDate = (text) => {
     }
 }
 
-const normalizeStem = (text) => stemMap[text.toLowerCase()] || text.toLowerCase()
+const normalizeStem = (text) =>
+    stemMap[text.toLowerCase()] || text.toLowerCase()
 
 const parseSculpt = (table, maker_id) => {
     let [titleNodes, attrNodes] = table.table.tableRows[0].tableCells[0].content
@@ -141,151 +142,165 @@ const parseSculpt = (table, maker_id) => {
     return { sculpt, stem }
 }
 
+const parseColorways = (table, document, maker_id, sculpt, stem) => {
+    const colorways = []
+
+    const cells = flatten(table.table.tableRows.map((r) => r.tableCells))
+
+    cells.forEach((cell, order) => {
+        const elements = flatten(cell.content.map((c) => c.paragraph.elements))
+
+        const colorway = {
+            name: '',
+            sculpt_id: sculpt.sculpt_id,
+            maker_id,
+            giveaway: false,
+            commissioned: false,
+            release: null,
+            qty: null,
+            photo_credit: null,
+            stem,
+            order,
+        }
+
+        const texts = []
+        elements.forEach((element) => {
+            if (element?.textRun?.content) {
+                texts.push(element.textRun.content.trim())
+            }
+
+            if (element?.inlineObjectElement?.inlineObjectId) {
+                const obj =
+                    document.inlineObjects[
+                        element.inlineObjectElement.inlineObjectId
+                    ]
+                const img = get(
+                    obj,
+                    'inlineObjectProperties.embeddedObject.imageProperties.contentUri'
+                )
+
+                colorway.remote_img = img
+                colorway.colorway_id = obj.objectId
+                colorway.img = `https://imagedelivery.net/${process.env.CF_IMAGES_ACCOUNT_HASH}/artisan/${maker_id}/${sculpt.sculpt_id}/${obj.objectId}/public`
+            }
+        })
+
+        let text = texts.join(' ')
+
+        const releaseMatch = regex.release.exec(text)
+        if (releaseMatch) {
+            colorway.release = normalizeDate(releaseMatch[1].trim())
+            text = text.replace(regex.release, '')
+        }
+
+        const qtyMatch = regex.qty.exec(text)
+        if (qtyMatch) {
+            colorway.qty = Number(qtyMatch[1])
+            text = text.replace(regex.qty, '')
+        }
+
+        const oneoffMatch = regex.oneoff.exec(text)
+        if (oneoffMatch) {
+            colorway.qty = 1
+            text = text.replace(regex.oneoff, '')
+        }
+
+        const commissionMatch = regex.commission.exec(text)
+        if (commissionMatch) {
+            colorway.commissioned = true
+            text = text.replace(regex.commission, '')
+        }
+
+        const giveawayMatch = regex.giveaway.exec(text)
+        if (giveawayMatch) {
+            colorway.giveaway = true
+            text = text.replace(regex.giveaway, '')
+        }
+
+        const photoCreditMatch = regex.photo_credit.exec(text)
+        if (photoCreditMatch) {
+            colorway.photo_credit = photoCreditMatch[1]
+            text = text.replace(regex.photo_credit, '')
+        }
+
+        const stemMatch = regex.stem.exec(text)
+        if (stemMatch) {
+            const stemTypes = stemMatch[1].split(' ')
+            colorway.stem = stemTypes.map(normalizeStem)
+            text = text.replace(regex.stem, '')
+        }
+
+        if (maker_id === 'fraktal-kaps') {
+            if (text.includes('°')) {
+                colorway.commissioned = true
+                text = text.replace('°', '')
+            }
+            if (text.includes('*')) {
+                colorway.qty = 1
+                text = text.replace('*', '')
+            }
+        }
+
+        if (maker_id === 'hello-caps') {
+            if (text.includes('*')) {
+                colorway.commissioned = true
+                text = text
+                    .replace('( * )', '')
+                    .replace('*', '')
+                    .replace('  ', ' ')
+            }
+        }
+
+        if (maker_id === 'keycat') {
+            if (text.includes('(GB)')) {
+                text = text.replace('(GB)', '')
+            }
+        }
+
+        if (maker_id === 'dreadkeys') {
+            const isCommission = regex.commission_dreadkeys.exec(text)
+            if (isCommission) {
+                colorway.commissioned = true
+                text = text.replace(regex.commission_dreadkeys, '')
+            }
+        }
+
+        colorway.name = normalize(text)
+
+        colorways.push(colorway)
+    })
+
+    return colorways
+}
+
 const parser = (document, maker_id) => {
     const tables = document.body.content.filter((b) => b.table)
 
     const chunks = chunk(tables, 2)
-    const sculpts = chunks.map((chunk) => {
+    const sculpts = chunks.map((chunk, index) => {
         if (chunk.length === 1) return null
 
-        const { sculpt, stem } = parseSculpt(chunk[0], maker_id)
-
-        const colorways = []
-
-        const cells = flatten(chunk[1].table.tableRows.map((r) => r.tableCells))
-
-        cells.forEach((cell, order) => {
-            const elements = flatten(
-                cell.content.map((c) => c.paragraph.elements)
+        try {
+            const { sculpt, stem } = parseSculpt(chunk[0], maker_id)
+            const colorways = parseColorways(
+                chunk[1],
+                document,
+                maker_id,
+                sculpt,
+                stem
             )
 
-            const colorway = {
-                name: '',
-                sculpt_id: sculpt.sculpt_id,
-                maker_id,
-                giveaway: false,
-                commissioned: false,
-                release: null,
-                qty: null,
-                photo_credit: null,
-                stem,
-                order,
+            sculpt.colorways = colorways.filter((c) => c.img)
+            const last = findLast(sculpt.colorways)
+            if (last) {
+                sculpt.img = last.img
             }
 
-            const texts = []
-            elements.forEach((element) => {
-                if (element?.textRun?.content) {
-                    texts.push(element.textRun.content.trim())
-                }
-
-                if (element?.inlineObjectElement?.inlineObjectId) {
-                    const obj =
-                        document.inlineObjects[
-                            element.inlineObjectElement.inlineObjectId
-                        ]
-                    const img = get(
-                        obj,
-                        'inlineObjectProperties.embeddedObject.imageProperties.contentUri'
-                    )
-
-                    colorway.remote_img = img
-                    colorway.colorway_id = obj.objectId
-                    colorway.img = `https://imagedelivery.net/${process.env.CF_IMAGES_ACCOUNT_HASH}/artisan/${maker_id}/${sculpt.sculpt_id}/${obj.objectId}/public`
-                }
-            })
-
-            let text = texts.join(' ')
-
-            const releaseMatch = regex.release.exec(text)
-            if (releaseMatch) {
-                colorway.release = normalizeDate(releaseMatch[1].trim())
-                text = text.replace(regex.release, '')
-            }
-
-            const qtyMatch = regex.qty.exec(text)
-            if (qtyMatch) {
-                colorway.qty = Number(qtyMatch[1])
-                text = text.replace(regex.qty, '')
-            }
-
-            const oneoffMatch = regex.oneoff.exec(text)
-            if (oneoffMatch) {
-                colorway.qty = 1
-                text = text.replace(regex.oneoff, '')
-            }
-
-            const commissionMatch = regex.commission.exec(text)
-            if (commissionMatch) {
-                colorway.commissioned = true
-                text = text.replace(regex.commission, '')
-            }
-
-            const giveawayMatch = regex.giveaway.exec(text)
-            if (giveawayMatch) {
-                colorway.giveaway = true
-                text = text.replace(regex.giveaway, '')
-            }
-
-            const photoCreditMatch = regex.photo_credit.exec(text)
-            if (photoCreditMatch) {
-                colorway.photo_credit = photoCreditMatch[1]
-                text = text.replace(regex.photo_credit, '')
-            }
-
-            const stemMatch = regex.stem.exec(text)
-            if (stemMatch) {
-                const stemTypes = stemMatch[1].split(' ')
-                colorway.stem = stemTypes.map(normalizeStem)
-                text = text.replace(regex.stem, '')
-            }
-
-            if (maker_id === 'fraktal-kaps') {
-                if (text.includes('°')) {
-                    colorway.commissioned = true
-                    text = text.replace('°', '')
-                }
-                if (text.includes('*')) {
-                    colorway.qty = 1
-                    text = text.replace('*', '')
-                }
-            }
-
-            if (maker_id === 'hello-caps') {
-                if (text.includes('*')) {
-                    colorway.commissioned = true
-                    text = text
-                        .replace('( * )', '')
-                        .replace('*', '')
-                        .replace('  ', ' ')
-                }
-            }
-
-            if (maker_id === 'keycat') {
-                if (text.includes('(GB)')) {
-                    text = text.replace('(GB)', '')
-                }
-            }
-
-            if (maker_id === 'dreadkeys') {
-                const isCommission = regex.commission_dreadkeys.exec(text)
-                if (isCommission) {
-                    colorway.commissioned = true
-                    text = text.replace(regex.commission_dreadkeys, '')
-                }
-            }
-
-            colorway.name = normalize(text)
-
-            colorways.push(colorway)
-        })
-
-        sculpt.colorways = colorways.filter((c) => c.img)
-        const last = findLast(sculpt.colorways)
-        if (last) {
-            sculpt.img = last.img
+            return sculpt
+        } catch (error) {
+            console.log('parse sculpt is broken at index', index)
+            throw error
         }
-
-        return sculpt
     })
 
     return keyBy(
