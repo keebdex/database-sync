@@ -4,6 +4,7 @@ const { urlSlugify } = require('./slugify')
 
 const regex = {
     artisan_keycap: /artisan keycaps|artisan keycap/gim,
+    auction: /\(auction\)/gim,
     commission_dreadkeys: /\(commission\)|\(comission\)/gim,
     commission: /\(\*\)/gim,
     giveaway: /\(giveaway\)|\(give-away\)|\(discord giveaway\)/gim,
@@ -154,8 +155,6 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
             name: '',
             sculpt_id: sculpt.sculpt_id,
             maker_id,
-            giveaway: false,
-            commissioned: false,
             release: null,
             qty: null,
             photo_credit: null,
@@ -205,15 +204,21 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
             text = text.replace(regex.oneoff, '')
         }
 
+        const auctionMatch = regex.auction.exec(text)
+        if (auctionMatch) {
+            colorway.sale_type = 'Auction'
+            text = text.replace(regex.auction, '')
+        }
+       
         const commissionMatch = regex.commission.exec(text)
         if (commissionMatch) {
-            colorway.commissioned = true
+            colorway.sale_type = 'Commission'
             text = text.replace(regex.commission, '')
         }
 
         const giveawayMatch = regex.giveaway.exec(text)
         if (giveawayMatch) {
-            colorway.giveaway = true
+            colorway.sale_type = 'Giveaway'
             text = text.replace(regex.giveaway, '')
         }
 
@@ -232,7 +237,7 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
 
         if (maker_id === 'fraktal-kaps') {
             if (text.includes('°')) {
-                colorway.commissioned = true
+                colorway.sale_type = 'Commission'
                 text = text.replace('°', '')
             }
             if (text.includes('*')) {
@@ -243,7 +248,7 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
 
         if (maker_id === 'hello-caps') {
             if (text.includes('*')) {
-                colorway.commissioned = true
+                colorway.sale_type = 'Commission'
                 text = text
                     .replace('( * )', '')
                     .replace('*', '')
@@ -253,6 +258,7 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
 
         if (maker_id === 'keycat') {
             if (text.includes('(GB)')) {
+                colorway.sale_type = 'Group Buy'
                 text = text.replace('(GB)', '')
             }
         }
@@ -260,7 +266,7 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
         if (maker_id === 'dreadkeys') {
             const isCommission = regex.commission_dreadkeys.exec(text)
             if (isCommission) {
-                colorway.commissioned = true
+                colorway.sale_type = 'Commission'
                 text = text.replace(regex.commission_dreadkeys, '')
             }
         }

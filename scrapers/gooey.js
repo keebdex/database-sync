@@ -32,8 +32,7 @@ const scraper = async () => {
                 maker_id,
                 sculpt_id,
                 release: normalizeDate(releaseDate),
-                giveaway: false,
-                commissioned: false,
+                sale_type: null,
                 colorway_id: crc32(
                     `${maker_id}-${sculpt_id}-${urlSlugify(name)}-${order}`
                 ).toString(16),

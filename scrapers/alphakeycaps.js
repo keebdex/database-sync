@@ -37,8 +37,7 @@ const sculptScraper = async (sculpt_id, sculpt_name) => {
             img,
             maker_id,
             sculpt_id,
-            giveaway: false,
-            commissioned: false,
+            sale_type: null,
             colorway_id: crc32(
                 `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
             ).toString(16),
