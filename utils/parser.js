@@ -5,8 +5,7 @@ const { urlSlugify } = require('./slugify')
 const regex = {
     artisan_keycap: /artisan keycaps|artisan keycap/gim,
     auction: /\(auction\)/gim,
-    commission_dreadkeys: /\(commission\)|\(comission\)/gim,
-    commission: /\(\*\)/gim,
+    commission: /\(\*\)|\(commission\)|\(comission\)/gim,
     giveaway: /\(giveaway\)|\(give-away\)|\(discord giveaway\)/gim,
     oneoff: /\(oneoff\)|\(one-off\)|\(1\/1\)/gim,
     photo_credit: /\(pc (.*)\)/gim,
@@ -260,14 +259,6 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
             if (text.includes('(GB)')) {
                 colorway.sale_type = 'Group Buy'
                 text = text.replace('(GB)', '')
-            }
-        }
-
-        if (maker_id === 'dreadkeys') {
-            const isCommission = regex.commission_dreadkeys.exec(text)
-            if (isCommission) {
-                colorway.sale_type = 'Commission'
-                text = text.replace(regex.commission_dreadkeys, '')
             }
         }
 

@@ -28,7 +28,7 @@ const sculptScraper = async (sculpt_id, sculpt_name) => {
         let stem = null
 
         if (name.includes(topre)) {
-            stem = ['topre']
+            stem = ['Topre']
             name = name.replace(topre, '')
         }
 
