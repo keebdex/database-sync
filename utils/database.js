@@ -20,7 +20,6 @@ const makeColorwayKey = (c, withOrder) => {
         c.sculpt_id,
         c.colorway_id,
         c.name,
-        c.sale_type,
         c.release,
         c.qty,
         c.photo_credit,
