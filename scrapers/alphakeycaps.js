@@ -32,15 +32,17 @@ const sculptScraper = async (sculpt_id, sculpt_name) => {
             name = name.replace(topre, '')
         }
 
+        const colorway_key = Array.isArray(stem)
+            ? `${maker_id}-${sculpt_id}-${urlSlugify(name)}-${stem.join('|')}`
+            : `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
+
         return {
             name: name.trim(),
             img,
             maker_id,
             sculpt_id,
             sale_type: null,
-            colorway_id: crc32(
-                `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
-            ).toString(16),
+            colorway_id: crc32(colorway_key).toString(16),
             order,
             stem,
         }
