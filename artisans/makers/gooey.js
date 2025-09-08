@@ -1,7 +1,7 @@
 const axios = require('axios')
 const { crc32 } = require('crc')
 const { findLast } = require('lodash')
-const { urlSlugify } = require('../utils/slugify')
+const { urlSlugify } = require('../../utils/slugify')
 const { format, parse } = require('date-fns')
 
 const maker_id = 'gooey-keys'

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "google-sync": "node google.js",
-    "scrapers-sync": "node scrapers.js",
+    "gdocs-importer": "node artisans/gdocs-importer.js",
+    "maker-scraper": "node artisans/maker-scraper.js",
     "sync-keycaps": "node jobs/sync-keycaps.js",
     "prune-images": "node jobs/prune-images.js"
   },

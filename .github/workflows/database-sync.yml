@@ -35,9 +35,9 @@ jobs:
         with:
           name: "keebdex.json"
           json: ${{ env.GOOGLE_SERVICE_ACCOUNT }}
-      - name: Sync from google docs
-        run: yarn google-sync
-      - name: Sync from maker website/api
-        run: yarn scrapers-sync
-      - name: Sync new keycaps
-        run: yarn sync-keycaps
+      - name: Sync data from Google Docs
+        run: yarn gdocs-importer
+      - name: Sync data from maker websites/APIs
+        run: yarn maker-scraper
+      # - name: Sync new keycaps to database
+      #   run: yarn sync-keycaps

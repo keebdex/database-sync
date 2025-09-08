@@ -7,10 +7,10 @@ const {
     makeImageId,
     updateMakerDatabase,
     updateMetadata,
-} = require('./utils/database')
-const { downloadDoc, getFile, getRevisions } = require('./utils/docs')
-const { uploadImage, getListImages } = require('./utils/image')
-const { parser } = require('./utils/parser')
+} = require('../utils/database')
+const { downloadDoc, getFile, getRevisions } = require('../utils/docs')
+const { uploadImage, getListImages } = require('../utils/image')
+const { parser } = require('../utils/parser')
 const { findLast, uniqBy } = require('lodash')
 
 let existedImages = []
@@ -108,6 +108,8 @@ async function scan(maker) {
 }
 
 getGDocMakers().then(async (makers) => {
+    console.log('🚀 Starting Google Docs import for artisans...')
+
     existedImages = await getListImages()
 
     makers = makers.filter(
