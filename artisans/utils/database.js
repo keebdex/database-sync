@@ -2,7 +2,7 @@ const { createClient } = require('@supabase/supabase-js')
 const Promise = require('bluebird')
 const { writeFileSync } = require('fs')
 const { flatten, difference, map, keyBy, isEmpty } = require('lodash')
-const { deleteImage } = require('./image')
+const { deleteImage } = require('../../utils/image')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,

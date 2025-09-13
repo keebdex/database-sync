@@ -5,8 +5,8 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Google Docs Updater",
-            "program": "${workspaceFolder}/google.js",
+            "name": "Launch Google Docs Importer",
+            "program": "${workspaceFolder}/artisans/gdocs-importer.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
@@ -14,8 +14,17 @@
             "type": "node"
         },
         {
-            "name": "Launch Scrapers",
-            "program": "${workspaceFolder}/scrapers.js",
+            "name": "Launch Maker Scraper",
+            "program": "${workspaceFolder}/artisans/maker-scraper.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "Launch Vendor Scraper",
+            "program": "${workspaceFolder}/keycaps/vendor-scraper.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"

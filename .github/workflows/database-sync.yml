@@ -39,5 +39,5 @@ jobs:
         run: yarn gdocs-importer
       - name: Sync data from maker websites/APIs
         run: yarn maker-scraper
-      # - name: Sync new keycaps to database
-      #   run: yarn sync-keycaps
+      - name: Sync new keycaps to database
+        run: yarn sync-keycaps

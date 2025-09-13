@@ -1,6 +1,6 @@
 const { format, parse } = require('date-fns')
 const { chunk, flatten, findLast, get, keyBy } = require('lodash')
-const { urlSlugify } = require('./slugify')
+const { urlSlugify } = require('../../utils')
 
 const regex = {
     artisan_keycap: /artisan keycaps|artisan keycap/gim,

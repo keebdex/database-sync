@@ -7,10 +7,10 @@ const {
     makeImageId,
     updateMakerDatabase,
     updateMetadata,
-} = require('../utils/database')
-const { downloadDoc, getFile, getRevisions } = require('../utils/docs')
+} = require('./utils/database')
+const { downloadDoc, getFile, getRevisions } = require('./utils/docs')
 const { uploadImage, getListImages } = require('../utils/image')
-const { parser } = require('../utils/parser')
+const { parser } = require('./utils/parser')
 const { findLast, uniqBy } = require('lodash')
 
 let existedImages = []

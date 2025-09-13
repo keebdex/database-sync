@@ -2,7 +2,7 @@ const { crc32 } = require('crc')
 const axios = require('axios')
 const xpath = require('xpath-html')
 const { findLast } = require('lodash')
-const { urlSlugify } = require('../../utils/slugify')
+const { urlSlugify } = require('../../utils')
 
 const baseUrl = 'https://alphakeycaps.com'
 const maker_id = 'alpha-keycaps'
