@@ -24,8 +24,8 @@
   "dependencies": {
     "@googleapis/docs": "^5.0.1",
     "@googleapis/drive": "^15.0.0",
-    "@supabase/supabase-js": "^2.57.2",
-    "axios": "^1.11.0",
+    "@supabase/supabase-js": "^2.57.4",
+    "axios": "^1.12.1",
     "bluebird": "^3.7.2",
     "crc": "^4.3.2",
     "date-fns": "^4.1.0",
