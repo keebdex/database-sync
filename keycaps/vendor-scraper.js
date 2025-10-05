@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const glob = require('fast-glob')
+const { glob } = require('fs/promises')
 const path = require('path')
 const { createClient } = require('@supabase/supabase-js')
 
@@ -10,27 +10,31 @@ const supabase = createClient(
 )
 
 // Load adapters with priority order
-function loadAdapters() {
-    const files = glob.sync(path.join(__dirname, 'adapters/*.js'))
+async function loadAdapters() {
     const priorityMap = {
         NovelKeys: 1,
         ProtoTypist: 2,
     }
 
-    return files
-        .map((file) => {
-            const adapter = require(file)
-            const name = adapter.name
-            const order = priorityMap[name] ?? 99
-            return { ...adapter, order }
-        })
-        .sort((a, b) => a.order - b.order)
+    const files = glob(path.join(__dirname, 'adapters/*.js'))
+
+    let adapters = []
+    for await (const file of files) {
+        const adapter = require(file)
+
+        const order = priorityMap[adapter.name] ?? 99
+        adapters.push({ ...adapter, order })
+    }
+
+    adapters = await Promise.all(adapters)
+
+    return adapters.sort((a, b) => a.order - b.order)
 }
 
 const syncKeycaps = async () => {
     console.log('🚀 Starting Keycap Sync Script')
 
-    const adapters = loadAdapters()
+    const adapters = await loadAdapters()
     const allKeycaps = new Map() // key: profile_keycap_id, value: { keycap, kits }
 
     for (const { name, fetchKeycaps } of adapters) {
