@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 1 * *" # On the 1st of every month at midnight UTC
-  push:
-    branches: [ "main" ]
+  # push:
+  #   branches: [ "main" ]
 
 env:
   NODE_ENV: production

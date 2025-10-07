@@ -23,25 +23,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/auth-js@npm:2.72.0":
-  version: 2.72.0
-  resolution: "@supabase/auth-js@npm:2.72.0"
+"@supabase/auth-js@npm:2.74.0":
+  version: 2.74.0
+  resolution: "@supabase/auth-js@npm:2.74.0"
   dependencies:
-    "@supabase/node-fetch": "npm:^2.6.14"
-  checksum: 10c0/744abb80a75fa93930754894c32c56f86352c877057bdd71cc943ca016922bcde14515bb5c19cac3b36403d010566205e6995cbe97044008c8ccbceeee9c3d97
+    "@supabase/node-fetch": "npm:2.6.15"
+  checksum: 10c0/b2677a00fcd16b4ccc9d9c33834a6df3e61e49d085a1326d358f8ffdb6aa31bf9cbf400194faaf0e743ae4c38d58bfa8e742e56c875e55ba644d7518d1d7183a
   languageName: node
   linkType: hard
 
-"@supabase/functions-js@npm:2.5.0":
-  version: 2.5.0
-  resolution: "@supabase/functions-js@npm:2.5.0"
+"@supabase/functions-js@npm:2.74.0":
+  version: 2.74.0
+  resolution: "@supabase/functions-js@npm:2.74.0"
   dependencies:
-    "@supabase/node-fetch": "npm:^2.6.14"
-  checksum: 10c0/499e31838da8aa8a41c7351fe4e3ffd9649a21dd2da27e7a45b6d0b64da92d7d81067239d481bfcbbdebcbafecf13d653aaa79b16fae93cf897981d9d2bc0ef4
+    "@supabase/node-fetch": "npm:2.6.15"
+  checksum: 10c0/2c8dd522249fdb3e3d4d6aafb4868e703a7094e2a45eeb650ea19805e99f6b3ccbccf4ace67a164f941d9963b08d9a752522db4be876d15a260ecf627af5b9ec
   languageName: node
   linkType: hard
 
-"@supabase/node-fetch@npm:2.6.15, @supabase/node-fetch@npm:^2.6.13, @supabase/node-fetch@npm:^2.6.14":
+"@supabase/node-fetch@npm:2.6.15":
   version: 2.6.15
   resolution: "@supabase/node-fetch@npm:2.6.15"
   dependencies:
@@ -50,56 +50,56 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/postgrest-js@npm:1.21.4":
-  version: 1.21.4
-  resolution: "@supabase/postgrest-js@npm:1.21.4"
+"@supabase/postgrest-js@npm:2.74.0":
+  version: 2.74.0
+  resolution: "@supabase/postgrest-js@npm:2.74.0"
   dependencies:
-    "@supabase/node-fetch": "npm:^2.6.14"
-  checksum: 10c0/9efa19a3b56c780c63b7caebca084f8c67750349f882c3221c5547153baaa4010b736d4fdd9a024ebdf117eab7de17770fecb698b39210f9903777522d9a7bff
+    "@supabase/node-fetch": "npm:2.6.15"
+  checksum: 10c0/bd858ef10a6cc95c845e10e7ae87172b0917d528253e476e806ac1013f85410f90e81d4c1f8d7b60a1a5547141496f7bd42d0e103861e4648f35ae08d55d7d3e
   languageName: node
   linkType: hard
 
-"@supabase/realtime-js@npm:2.15.5":
-  version: 2.15.5
-  resolution: "@supabase/realtime-js@npm:2.15.5"
+"@supabase/realtime-js@npm:2.74.0":
+  version: 2.74.0
+  resolution: "@supabase/realtime-js@npm:2.74.0"
   dependencies:
-    "@supabase/node-fetch": "npm:^2.6.13"
+    "@supabase/node-fetch": "npm:2.6.15"
     "@types/phoenix": "npm:^1.6.6"
     "@types/ws": "npm:^8.18.1"
     ws: "npm:^8.18.2"
-  checksum: 10c0/df8946a54a10dc1cca6f697d41617ea19c60932dfa881a789e27e9d129851e5c84776f055206bc7753c1633667fc38ee4fc407ab769208a6d0e56d5d6fbe8322
+  checksum: 10c0/5a271ccec9f39e6a03abec0c356628896c4bd3eba56a3bcb02a50408a64b2d20cc2973912ea10cef709994f5cbb0fbc00166bdf5384c7847bf02ccc272fe86a9
   languageName: node
   linkType: hard
 
-"@supabase/storage-js@npm:2.12.2":
-  version: 2.12.2
-  resolution: "@supabase/storage-js@npm:2.12.2"
+"@supabase/storage-js@npm:2.74.0":
+  version: 2.74.0
+  resolution: "@supabase/storage-js@npm:2.74.0"
   dependencies:
-    "@supabase/node-fetch": "npm:^2.6.14"
-  checksum: 10c0/f8c1194bba17d839c663b9d114c5d9e74bb55cbbc52f62f87edebb908e9c3f241d900a0fa4bd16b13c9cbbfe9bbe602c77917e13f6628216572be4ba7474849e
-  languageName: node
-  linkType: hard
-
-"@supabase/supabase-js@npm:^2.58.0":
-  version: 2.58.0
-  resolution: "@supabase/supabase-js@npm:2.58.0"
-  dependencies:
-    "@supabase/auth-js": "npm:2.72.0"
-    "@supabase/functions-js": "npm:2.5.0"
     "@supabase/node-fetch": "npm:2.6.15"
-    "@supabase/postgrest-js": "npm:1.21.4"
-    "@supabase/realtime-js": "npm:2.15.5"
-    "@supabase/storage-js": "npm:2.12.2"
-  checksum: 10c0/73c024c01d4ab12157e2df97c17305c8bafe88b9115fe81d77b2482c8d6427932c48c19c29b290e3c75a3e3e3a134732853c1b2bf9e257e1ea79a49c571e4b9d
+  checksum: 10c0/19f56ce88e6512c24a45bd4d572e80ab2f159cb7bf3b58db3e55765b8979ebc465fb032457006013ee405b22dcc38361a401743910d49e2bbdf5408ebcbcb7f5
+  languageName: node
+  linkType: hard
+
+"@supabase/supabase-js@npm:^2.74.0":
+  version: 2.74.0
+  resolution: "@supabase/supabase-js@npm:2.74.0"
+  dependencies:
+    "@supabase/auth-js": "npm:2.74.0"
+    "@supabase/functions-js": "npm:2.74.0"
+    "@supabase/node-fetch": "npm:2.6.15"
+    "@supabase/postgrest-js": "npm:2.74.0"
+    "@supabase/realtime-js": "npm:2.74.0"
+    "@supabase/storage-js": "npm:2.74.0"
+  checksum: 10c0/cd5230bd28ae784520ed9c8054d2f8d7cbc8ed5ba27495fe5011ed6e212b36d118b5318e954ed2046028645bb6e1e75349a304bf9f981cd1af08c369b79c9318
   languageName: node
   linkType: hard
 
 "@types/node@npm:*":
-  version: 24.6.2
-  resolution: "@types/node@npm:24.6.2"
+  version: 24.7.0
+  resolution: "@types/node@npm:24.7.0"
   dependencies:
-    undici-types: "npm:~7.13.0"
-  checksum: 10c0/d029757711be85ec468686f66cd8eca78f5996d7e2b1a5b818436e0299b19925b0fb4f7509a6b62750abdc72d66f5750ce22fb8b55559baca86df89a9c44722e
+    undici-types: "npm:~7.14.0"
+  checksum: 10c0/f036c78062cb3a0d5c6586bf2dac347ed3f4af121cef4ab92c85c44e32be1c50aab5ba96955842b7f8165f0e0f1c8066d1813ae259372df6c0fa9fadb1116a3e
   languageName: node
   linkType: hard
 
@@ -445,7 +445,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"google-auth-library@npm:^10.1.0":
+"google-auth-library@npm:^10.1.0, google-auth-library@npm:^10.4.0":
   version: 10.4.0
   resolution: "google-auth-library@npm:10.4.0"
   dependencies:
@@ -575,13 +575,14 @@ __metadata:
   dependencies:
     "@googleapis/docs": "npm:^7.0.0"
     "@googleapis/drive": "npm:^18.0.0"
-    "@supabase/supabase-js": "npm:^2.58.0"
+    "@supabase/supabase-js": "npm:^2.74.0"
     axios: "npm:^1.12.2"
     bluebird: "npm:^3.7.2"
     crc: "npm:^4.3.2"
     date-fns: "npm:^4.1.0"
     deepmerge: "npm:^4.3.1"
     dotenv: "npm:^17.2.3"
+    google-auth-library: "npm:^10.4.0"
     ini: "npm:^5.0.0"
     lodash: "npm:^4.17.21"
     slugify: "npm:^1.6.6"
@@ -750,10 +751,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~7.13.0":
-  version: 7.13.0
-  resolution: "undici-types@npm:7.13.0"
-  checksum: 10c0/44bbb0935425291351bfd8039571f017295b5d6dc5727045d0a4fea8c6ffe73a6703b48ce010f9cb539b9041a75b463f8cfe1e7309cab7486452505fb0d66151
+"undici-types@npm:~7.14.0":
+  version: 7.14.0
+  resolution: "undici-types@npm:7.14.0"
+  checksum: 10c0/e7f3214b45d788f03c51ceb33817be99c65dae203863aa9386b3ccc47201a245a7955fc721fb581da9c888b6ebad59fa3f53405214afec04c455a479908f0f14
   languageName: node
   linkType: hard
 

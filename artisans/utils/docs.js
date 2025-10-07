@@ -1,12 +1,30 @@
 const docs = require('@googleapis/docs')
 const drive = require('@googleapis/drive')
+const { JWT } = require('google-auth-library')
 const path = require('path')
 
-const downloadDoc = async (documentId) => {
-    const auth = new docs.auth.GoogleAuth({
-        keyFile: path.join(__dirname, '..', '..', '/keebdex.json'),
-        scopes: ['https://www.googleapis.com/auth/documents'],
+const credentials = require(path.join(__dirname, '..', '..', '/keebdex.json'))
+
+const getAuth = async () => {
+    const client = new JWT({
+        email: credentials.client_email,
+        key: credentials.private_key,
+        scopes: [
+            'https://www.googleapis.com/auth/documents',
+            'https://www.googleapis.com/auth/drive',
+        ],
     })
+
+    const tokens = await client.authorize()
+    if (!tokens.access_token) {
+        throw new Error('Error while trying to retrieve access token')
+    }
+
+    return client
+}
+
+const downloadDoc = async (documentId) => {
+    const auth = await getAuth()
 
     const { data } = await docs
         .docs({ version: 'v1', auth })
@@ -16,10 +34,7 @@ const downloadDoc = async (documentId) => {
 }
 
 const getFile = async (fileId) => {
-    const auth = new drive.auth.GoogleAuth({
-        keyFile: path.join(__dirname, '..', '..', '/keebdex.json'),
-        scopes: ['https://www.googleapis.com/auth/drive'],
-    })
+    const auth = await getAuth()
 
     const { data } = await drive
         .drive({ version: 'v3', auth })
@@ -29,10 +44,7 @@ const getFile = async (fileId) => {
 }
 
 const getRevisions = async (fileId, revisions = [], pageToken) => {
-    const auth = new drive.auth.GoogleAuth({
-        keyFile: path.join(__dirname, '..', '..', '/keebdex.json'),
-        scopes: ['https://www.googleapis.com/auth/drive'],
-    })
+    const auth = await getAuth()
 
     const { data } = await drive
         .drive({ version: 'v3', auth })
