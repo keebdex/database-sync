@@ -208,7 +208,7 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
             colorway.sale_type = 'Auction'
             text = text.replace(regex.auction, '')
         }
-       
+
         const commissionMatch = regex.commission.exec(text)
         if (commissionMatch) {
             colorway.sale_type = 'Commission'
@@ -270,8 +270,55 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
     return colorways
 }
 
+const isHeader = (table) => {
+    let [titleNodes] = table.table.tableRows[0].tableCells[0].content
+
+    try {
+        let text = titleNodes.paragraph.elements
+            .map((s) => s.textRun.content.trim())
+            .join('')
+
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+const mergeConsecutiveTables = (tables) => {
+    if (!Array.isArray(tables) || !tables.length) {
+        return []
+    }
+
+    const merged = []
+
+    for (let i = 0; i < tables.length; i++) {
+        const current = tables[i]
+        const isHeaderTable = isHeader(current)
+
+        if (isHeaderTable) {
+            merged.push(current)
+        } else {
+            let j = i + 1
+            while (j < tables.length && !isHeader(tables[j])) {
+                // merge tableRows
+                current.table.tableRows.push(...tables[j].table.tableRows)
+                j++
+            }
+
+            merged.push(current)
+
+            // skip the merged tables
+            i = j - 1
+        }
+    }
+
+    return merged
+}
+
 const parser = (document, maker_id) => {
-    const tables = document.body.content.filter((b) => b.table)
+    let tables = document.body.content.filter((b) => b.table)
+
+    tables = mergeConsecutiveTables(tables)
 
     const chunks = chunk(tables, 2)
     const sculpts = chunks.map((chunk, index) => {
