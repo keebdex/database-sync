@@ -1,6 +1,6 @@
 const { crc32 } = require('crc')
 const axios = require('axios')
-const xpath = require('xpath-html')
+const cheerio = require('cheerio')
 const { findLast } = require('lodash')
 const { urlSlugify } = require('../../utils')
 
@@ -15,38 +15,40 @@ const sculptScraper = async (sculpt_id, sculpt_name) => {
         url: `${baseUrl}/${sculpt_id}`,
     })
 
-    const nodes = xpath.fromPageSource(data).findElements('//figure')
+    const $ = cheerio.load(data)
 
-    return nodes.map((node, order) => {
-        const text = xpath.fromNode(node).findElement('//strong').getText()
-        const img = xpath
-            .fromNode(node)
-            .findElement('//img')
-            .getAttribute('data-src')
+    const nodes = $('figure')
 
-        let name = text.replace(sculpt_name, '')
-        let stem = null
+    return nodes
+        .map((index, element) => {
+            const node = $(element)
+            const text = node.find('strong').text()
+            const img = node.find('img').attr('data-src')
 
-        if (name.includes(topre)) {
-            stem = ['Topre']
-            name = name.replace(topre, '')
-        }
+            let name = text.replace(sculpt_name, '')
+            let stem = null
 
-        const colorway_key = Array.isArray(stem)
-            ? `${maker_id}-${sculpt_id}-${urlSlugify(name)}-${stem.join('|')}`
-            : `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
+            if (name.includes(topre)) {
+                stem = ['Topre']
+                name = name.replace(topre, '')
+            }
 
-        return {
-            name: name.trim(),
-            img,
-            maker_id,
-            sculpt_id,
-            sale_type: null,
-            colorway_id: crc32(colorway_key).toString(16),
-            order,
-            stem,
-        }
-    })
+            const colorway_key = Array.isArray(stem)
+                ? `${maker_id}-${sculpt_id}-${urlSlugify(name)}-${stem.join('|')}`
+                : `${maker_id}-${sculpt_id}-${urlSlugify(name)}`
+
+            return {
+                name: name.trim(),
+                img,
+                maker_id,
+                sculpt_id,
+                sale_type: null,
+                colorway_id: crc32(colorway_key).toString(16),
+                order: index,
+                stem,
+            }
+        })
+        .get()
 }
 
 const catalogs = [
