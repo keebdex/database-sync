@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { crc32 } = require('crc')
 const cheerio = require('cheerio')
+const { groupBy } = require('lodash')
 const { urlSlugify } = require('../../utils')
 
 const SHOP_URL = 'https://thekeycat.com/shop'
@@ -124,7 +125,20 @@ const scraper = async () => {
         const html = await axios.get(SHOP_URL).then((res) => res.data)
         const sales = extractSales(html)
 
-        console.log(JSON.stringify(sales, null, 2))
+        const sculpts = groupBy(sales, 'sculpt_id')
+
+        const tables = Object.entries(sculpts).map(
+            ([sculpt_id, colorways]) => ({
+                maker_id,
+                sculpt_id,
+                name: sculpt_id.charAt(0).toUpperCase() + sculpt_id.slice(1),
+                img: colorways[0]?.img || null,
+                colorways,
+            })
+        )
+
+        // FIXME: need to find a way to merge with existing data without losing colorways
+        return [] // tables
     } catch (err) {
         console.error(err)
         process.exit(1)
