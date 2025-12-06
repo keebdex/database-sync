@@ -22,9 +22,9 @@
   },
   "homepage": "https://github.com/anhthang/keebdex-database-sync#readme",
   "dependencies": {
-    "@googleapis/docs": "^8.1.0",
-    "@googleapis/drive": "^19.1.0",
-    "@supabase/supabase-js": "^2.79.0",
+    "@googleapis/docs": "^8.1.1",
+    "@googleapis/drive": "^19.2.0",
+    "@supabase/supabase-js": "^2.86.2",
     "axios": "^1.13.2",
     "bluebird": "^3.7.2",
     "cheerio": "^1.1.2",
