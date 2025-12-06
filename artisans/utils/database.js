@@ -10,6 +10,7 @@ const supabase = createClient(
 )
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
+let dryRun = false
 
 const sculptTable = 'sculpts'
 const colorwayTable = 'colorways'
@@ -80,6 +81,11 @@ const getColorways = async (maker_id, rows = []) => {
 }
 
 const insertRows = async (table, values) => {
+    if (dryRun) {
+        console.log(`[DRY RUN] Would insert ${values.length} rows into ${table}`)
+        return
+    }
+
     const { error } = await supabase.from(table).insert(values)
 
     if (error) {
@@ -88,6 +94,11 @@ const insertRows = async (table, values) => {
 }
 
 const deleteRows = async (table, column, values) => {
+    if (dryRun) {
+        console.log(`[DRY RUN] Would delete ${values.length} rows from ${table}`)
+        return
+    }
+
     const { error } = await supabase.from(table).delete().in(column, values)
 
     if (error) {
@@ -96,6 +107,11 @@ const deleteRows = async (table, column, values) => {
 }
 
 const updateRow = async (table, id, values) => {
+    if (dryRun) {
+        console.log(`[DRY RUN] Would update ${table} row with id: ${id}`)
+        return
+    }
+
     const { error } = await supabase.from(table).update(values).eq('id', id)
 
     if (error) {
@@ -309,6 +325,11 @@ const updateMakerDatabase = async (tables) => {
 }
 
 const updateMetadata = async (id, data) => {
+    if (dryRun) {
+        console.log(`[DRY RUN] Would update maker metadata with id: ${id}`)
+        return
+    }
+
     const { error } = await supabase.from('makers').update(data).eq('id', id)
 
     if (error) {
@@ -321,4 +342,7 @@ module.exports = {
     makeImageId,
     updateMakerDatabase,
     updateMetadata,
+    setDryRun(value) {
+        dryRun = value
+    },
 }

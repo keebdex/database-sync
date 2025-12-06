@@ -7,11 +7,19 @@ const {
     makeImageId,
     updateMakerDatabase,
     updateMetadata,
+    setDryRun,
 } = require('./utils/database')
 const { downloadDoc, getFile, getRevisions } = require('./utils/docs')
 const { uploadImage, getListImages } = require('../utils/image')
 const { parser } = require('./utils/parser')
 const { findLast, uniqBy } = require('lodash')
+
+// Check for dry-run flag from command line arguments
+const isDryRun = process.argv.includes('--dry-run')
+if (isDryRun) {
+    console.log('🔄 DRY RUN MODE - Database operations will be logged but not executed')
+    setDryRun(true)
+}
 
 let existedImages = []
 

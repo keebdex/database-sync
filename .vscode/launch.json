@@ -11,7 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "node"
+            "type": "node",
+            "args": ["--dry-run"]
         },
         {
             "name": "Launch Maker Scraper",
@@ -20,7 +21,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "node"
+            "type": "node",
+            "args": ["--dry-run"]
         },
         {
             "name": "Launch Vendor Scraper",
@@ -29,7 +31,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "node"
+            "type": "node",
+            "args": ["--dry-run"]
         },
         {
             "type": "node",
