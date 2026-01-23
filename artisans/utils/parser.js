@@ -13,10 +13,11 @@ const regex = {
     release_jelly_key: /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim,
     release: /\(([a-zA-Z0-9 ]*\d{4})\)/gim,
     stem: /\(stemtype\s+((?:topre|mx|alps|tmx|choc|bs)(?:\s+(?:topre|mx|alps|tmx|choc|bs))*)\b\)/gim,
-    stem_sculpt: /\((topre|mx|alps|tmx|choc|bs)\)/gim,
+    stem_title: /\((topre|mx|alps|tmx|choc|bs)\)/gim,
 }
 
 const stemMap = {
+    t: 'Topre',
     topre: 'Topre',
     mx: 'MX',
     alps: 'Alps',
@@ -130,10 +131,10 @@ const parseSculpt = (table, maker_id) => {
 
     // try parse stem from the sculpt name and assign to all colorways
     let stem = null
-    const stemMatch = regex.stem_sculpt.exec(text)
+    const stemMatch = regex.stem_title.exec(text)
     if (stemMatch) {
         stem = [normalizeStem(stemMatch[1])]
-        text = text.replace(regex.stem_sculpt, '')
+        text = text.replace(regex.stem_title, '')
     }
 
     sculpt.name = normalize(text)
@@ -228,10 +229,15 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
         }
 
         const stemMatch = regex.stem.exec(text)
+        const stemTextMatch = regex.stem_title.exec(text)
+
         if (stemMatch) {
             const stemTypes = stemMatch[1].split(' ')
             colorway.stem = stemTypes.map(normalizeStem)
             text = text.replace(regex.stem, '')
+        } else if (stemTextMatch) {
+            colorway.stem = [normalizeStem(stemTextMatch[1])]
+            text = text.replace(regex.stem_title, '')
         }
 
         if (maker_id === 'fraktal-kaps') {
