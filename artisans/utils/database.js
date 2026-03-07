@@ -61,6 +61,7 @@ const getGDocMakers = () =>
         .from('makers')
         .select()
         .neq('deleted', true)
+        .neq('disable_google_sync', true)
         .then(({ data }) => data.filter((r) => Array.isArray(r.document_ids)))
 
 const getColorways = async (maker_id, rows = []) => {
