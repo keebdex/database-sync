@@ -4,6 +4,7 @@ const { createClient } = require('@supabase/supabase-js')
 const Promise = require('bluebird')
 const { difference, flattenDeep } = require('lodash')
 const { getListImages, deleteImage } = require('../utils/image')
+const { ARTISAN_COLORWAYS_TABLE } = require('../utils')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -14,7 +15,7 @@ const scrapers = ['alpha-keycaps', 'gooey-keys']
 
 const getColorways = async (rows = []) => {
     const { data } = await supabase
-        .from('colorways')
+        .from(ARTISAN_COLORWAYS_TABLE)
         .select('img')
         .not('maker_id', 'in', `(${scrapers.join()})`)
         .neq('img', '')

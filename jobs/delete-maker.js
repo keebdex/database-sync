@@ -1,6 +1,11 @@
 require('dotenv').config()
 
 const { createClient } = require('@supabase/supabase-js')
+const {
+    ARTISAN_MAKERS_TABLE,
+    ARTISAN_SCULPTS_TABLE,
+    ARTISAN_COLORWAYS_TABLE,
+} = require('../utils')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -11,7 +16,7 @@ const [_node, _path, ...rest] = process.argv
 
 async function deleteMakers() {
     await supabase
-        .from('colorways')
+        .from(ARTISAN_COLORWAYS_TABLE)
         .delete()
         .in('maker_id', rest)
         .then(({ status, statusText }) => {
@@ -22,7 +27,7 @@ async function deleteMakers() {
         })
 
     await supabase
-        .from('sculpts')
+        .from(ARTISAN_SCULPTS_TABLE)
         .delete()
         .in('maker_id', rest)
         .then(({ status, statusText }) => {
@@ -33,7 +38,7 @@ async function deleteMakers() {
         })
 
     await supabase
-        .from('makers')
+        .from(ARTISAN_MAKERS_TABLE)
         .delete()
         .in('id', rest)
         .then(({ status, statusText }) => {

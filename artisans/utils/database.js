@@ -3,6 +3,11 @@ const Promise = require('bluebird')
 const { writeFileSync } = require('fs')
 const { flatten, difference, map, keyBy, isEmpty } = require('lodash')
 const { deleteImage } = require('../../utils/image')
+const {
+    ARTISAN_MAKERS_TABLE,
+    ARTISAN_SCULPTS_TABLE,
+    ARTISAN_COLORWAYS_TABLE,
+} = require('../../utils')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -11,9 +16,6 @@ const supabase = createClient(
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 let dryRun = false
-
-const sculptTable = 'sculpts'
-const colorwayTable = 'colorways'
 
 const makeColorwayKey = (c, withOrder) => {
     const keys = [
@@ -58,7 +60,7 @@ const makerSculptId = (s) => `${s.maker_id}/${s.sculpt_id}`
 
 const getGDocMakers = () =>
     supabase
-        .from('makers')
+        .from(ARTISAN_MAKERS_TABLE)
         .select()
         .neq('deleted', true)
         .neq('disable_google_sync', true)
@@ -66,7 +68,7 @@ const getGDocMakers = () =>
 
 const getColorways = async (maker_id, rows = []) => {
     const { data } = await supabase
-        .from('colorways')
+        .from(ARTISAN_COLORWAYS_TABLE)
         .select()
         .eq('maker_id', maker_id)
         .order('id')
@@ -122,7 +124,7 @@ const updateRow = async (table, id, values) => {
 
 const updateSculpts = async (sculpts) => {
     const { data: storedSculpts } = await supabase
-        .from('sculpts')
+        .from(ARTISAN_SCULPTS_TABLE)
         .select()
         .eq('maker_id', sculpts[0].maker_id)
 
@@ -162,7 +164,7 @@ const updateSculpts = async (sculpts) => {
     const newSculpts = Object.values(insertingMap)
 
     if (newSculpts.length) {
-        await insertRows(sculptTable, newSculpts)
+        await insertRows(ARTISAN_SCULPTS_TABLE, newSculpts)
 
         console.log('sculpts inserted', newSculpts.length)
     }
@@ -170,7 +172,7 @@ const updateSculpts = async (sculpts) => {
     if (!isEmpty(updateSculpt)) {
         await Promise.map(
             Object.entries(updateSculpt),
-            ([id, data]) => updateRow(sculptTable, id, data),
+            ([id, data]) => updateRow(ARTISAN_SCULPTS_TABLE, id, data),
             { concurrency: 1 }
         )
 
@@ -180,12 +182,12 @@ const updateSculpts = async (sculpts) => {
     // maybe we need to remove colorways which is deleted sculpt
     if (deletedSculpts.length) {
         await deleteRows(
-            colorwayTable,
+            ARTISAN_COLORWAYS_TABLE,
             'maker_sculpt_id',
             deletedSculpts.map(makerSculptId)
         )
         await deleteRows(
-            sculptTable,
+            ARTISAN_SCULPTS_TABLE,
             'id',
             deletedSculpts.map((s) => s.id)
         )
@@ -270,7 +272,7 @@ const updateMakerDatabase = async (tables) => {
 
     if (insertClws.length) {
         modified = true
-        await insertRows(colorwayTable, insertClws)
+        await insertRows(ARTISAN_COLORWAYS_TABLE, insertClws)
 
         console.log('colorways inserted', insertClws.length)
     }
@@ -282,7 +284,7 @@ const updateMakerDatabase = async (tables) => {
             Object.entries(updateClw),
             async ([rowKey, data]) => {
                 const [id, old_colorway_id] = rowKey.split('__')
-                await updateRow(colorwayTable, id, data)
+                await updateRow(ARTISAN_COLORWAYS_TABLE, id, data)
             },
             { concurrency: 1 }
         )
@@ -307,14 +309,14 @@ const updateMakerDatabase = async (tables) => {
         await Promise.map(
             outdatedItems,
             async (id) => {
-                await updateRow(colorwayTable, id, { deleted: true })
+                await updateRow(ARTISAN_COLORWAYS_TABLE, id, { deleted: true })
             },
             { concurrency: 1 }
         )
 
         // deleting colorways does not add them to any collections
         await deleteRows(
-            colorwayTable,
+            ARTISAN_COLORWAYS_TABLE,
             'id',
             deletedRows.filter((id) => !outdatedItems.includes(id))
         )
@@ -331,7 +333,10 @@ const updateMetadata = async (id, data) => {
         return
     }
 
-    const { error } = await supabase.from('makers').update(data).eq('id', id)
+    const { error } = await supabase
+        .from(ARTISAN_MAKERS_TABLE)
+        .update(data)
+        .eq('id', id)
 
     if (error) {
         console.warn(`update maker error`, id, error)

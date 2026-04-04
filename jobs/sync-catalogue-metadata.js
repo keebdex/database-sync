@@ -5,6 +5,7 @@ const drive = require('@googleapis/drive')
 const Promise = require('bluebird')
 const { flattenDeep } = require('lodash')
 const path = require('path')
+const { ARTISAN_MAKERS_TABLE } = require('../utils')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -13,7 +14,7 @@ const supabase = createClient(
 
 const getActiveDocIds = () =>
     supabase
-        .from('makers')
+        .from(ARTISAN_MAKERS_TABLE)
         .select('id, document_ids')
         .neq('deleted', true)
         .then(({ data }) => data.filter((r) => Array.isArray(r.document_ids)))
