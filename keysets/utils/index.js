@@ -26,16 +26,16 @@ const profileIdMapping = {
     XDA: 'xda',
 }
 
-// Function to find the profile_id and clean the keycap name
-const getProfileInfo = (keycapName) => {
-    const normalizedName = keycapName.toUpperCase()
+// Function to find the profile_id and clean the keyset name
+const getProfileInfo = (keysetName) => {
+    const normalizedName = keysetName.toUpperCase()
     let profileId = null
-    let cleanedName = keycapName
+    let cleanedName = keysetName
 
     for (const name in profileIdMapping) {
         if (normalizedName.includes(name.toUpperCase())) {
             profileId = profileIdMapping[name]
-            cleanedName = keycapName.replace(new RegExp(name, 'i'), '').trim()
+            cleanedName = keysetName.replace(new RegExp(name, 'i'), '').trim()
             break
         }
     }

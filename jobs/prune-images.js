@@ -31,9 +31,9 @@ const getColorways = async (rows = []) => {
     return rows
 }
 
-const getKeycaps = async (rows = []) => {
+const getKeysets = async (rows = []) => {
     const { data } = await supabase
-        .from('keycaps')
+        .from('keysets')
         .select('img')
         .neq('img', '')
         .order('id')
@@ -42,13 +42,13 @@ const getKeycaps = async (rows = []) => {
     rows = rows.concat(data)
 
     if (data.length === 1000) {
-        return getKeycaps(rows)
+        return getKeysets(rows)
     }
 
     return rows
 }
 
-Promise.all([getColorways(), getKeycaps()])
+Promise.all([getColorways(), getKeysets()])
     .then(flattenDeep)
     .then(async (rows) => {
         const dbImages = rows.map((row) =>

@@ -10,7 +10,7 @@ function mapStatus(tags = []) {
     return null
 }
 
-async function fetchKeycaps() {
+async function fetchKeysets() {
     const url = 'https://novelkeys.xyz/products.json'
     const response = await axios.get(url)
     const { products } = response.data
@@ -23,20 +23,20 @@ async function fetchKeycaps() {
 
             const finalName = cleanedName || p.title
             const slug = urlSlugify(finalName)
-            const profile_keycap_id = `${profileId}/${slug}`
+            const profile_keyset_id = `${profileId}/${slug}`
 
             const kits = p.variants.map((v) => ({
                 qty: v.inventory_quantity,
                 name: v.title,
                 price: parseFloat(v.price),
-                profile_keycap_id,
+                profile_keyset_id,
                 img: v.featured_image?.src ?? null,
             }))
 
             return {
-                keycap: {
+                keyset: {
                     name: finalName,
-                    profile_keycap_id,
+                    profile_keyset_id,
                     profile_id: profileId,
                     url: `https://novelkeys.xyz/products/${p.handle}`,
                     description: removeHtmlTags(p.body_html),
@@ -51,4 +51,4 @@ async function fetchKeycaps() {
         .filter(Boolean)
 }
 
-module.exports = { name: 'NovelKeys', fetchKeycaps }
+module.exports = { name: 'NovelKeys', fetchKeysets }

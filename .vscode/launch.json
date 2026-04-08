@@ -26,7 +26,7 @@
         },
         {
             "name": "Launch Vendor Scraper",
-            "program": "${workspaceFolder}/keycaps/vendor-scraper.js",
+            "program": "${workspaceFolder}/keysets/vendor-scraper.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
@@ -46,11 +46,11 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Sync Keycap Images",
+            "name": "Launch Sync Keyset Images",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/jobs/sync-keycaps.js"
+            "program": "${workspaceFolder}/jobs/sync-keysets.js"
         }
     ]
 }

@@ -73,7 +73,7 @@ function mapStatus(tags = []) {
     return null
 }
 
-async function fetchKeycaps() {
+async function fetchKeysets() {
     const url = 'https://prototypist.net/products.json'
     const response = await axios.get(url)
     const { products } = response.data
@@ -94,7 +94,7 @@ async function fetchKeycaps() {
 
             // Generate slug
             const slug = urlSlugify(finalName)
-            const profile_keycap_id = `${profileId}/${slug}`
+            const profile_keyset_id = `${profileId}/${slug}`
 
             // variants → kits
             const kits = p.variants
@@ -108,7 +108,7 @@ async function fetchKeycaps() {
                 .map((v) => ({
                     name: normalizeKitName(v.title),
                     price: parseFloat(v.price),
-                    profile_keycap_id,
+                    profile_keyset_id,
                     img: v.featured_image?.src ?? null,
                 }))
 
@@ -118,9 +118,9 @@ async function fetchKeycaps() {
             const description = removeGroupBuyLines(rawDescription)
 
             return {
-                keycap: {
+                keyset: {
                     name: finalName,
-                    profile_keycap_id,
+                    profile_keyset_id,
                     profile_id: profileId,
                     url: `https://prototypist.net/products/${p.handle}`,
                     // description: description.replace(/\s+/g, ' '),
@@ -136,4 +136,4 @@ async function fetchKeycaps() {
         .filter(Boolean)
 }
 
-module.exports = { name: 'ProtoTypist', fetchKeycaps }
+module.exports = { name: 'ProtoTypist', fetchKeysets }

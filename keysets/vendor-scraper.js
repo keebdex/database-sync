@@ -31,69 +31,69 @@ async function loadAdapters() {
     return adapters.sort((a, b) => a.order - b.order)
 }
 
-const syncKeycaps = async () => {
-    console.log('🚀 Starting Keycap Sync Script')
+const syncKeysets = async () => {
+    console.log('🚀 Starting Keyset Sync Script')
 
     const adapters = await loadAdapters()
-    const allKeycaps = new Map() // key: profile_keycap_id, value: { keycap, kits }
+    const allKeysets = new Map() // key: profile_keyset_id, value: { keyset, kits }
 
-    for (const { name, fetchKeycaps } of adapters) {
+    for (const { name, fetchKeysets } of adapters) {
         console.log(`\n📦 Fetching from ${name}...`)
 
         try {
-            const keycaps = await fetchKeycaps()
+            const keysets = await fetchKeysets()
 
-            for (const { keycap, kits } of keycaps) {
-                const id = keycap.profile_keycap_id
+            for (const { keyset, kits } of keysets) {
+                const id = keyset.profile_keyset_id
 
                 // Skip if already added from higher priority adapter
-                if (allKeycaps.has(id)) continue
+                if (allKeysets.has(id)) continue
 
-                allKeycaps.set(id, { keycap, kits })
+                allKeysets.set(id, { keyset, kits })
             }
         } catch (err) {
             console.error(`‼️ Failed to fetch from ${name}:`, err.message)
         }
     }
 
-    console.log(`\n📊 Total unique keycaps: ${allKeycaps.size}`)
+    console.log(`\n📊 Total unique keysets: ${allKeysets.size}`)
 
     // Insert into Supabase
-    for (const { keycap, kits } of allKeycaps.values()) {
+    for (const { keyset, kits } of allKeysets.values()) {
         const { data: existing } = await supabase
-            .from('keycaps')
-            .select('profile_keycap_id')
-            .eq('profile_keycap_id', keycap.profile_keycap_id)
+            .from('keysets')
+            .select('profile_keyset_id')
+            .eq('profile_keyset_id', keyset.profile_keyset_id)
             .single()
 
         if (existing) {
-            console.log(`🔁 ${keycap.name} already exists. Skipping.`)
+            console.log(`🔁 ${keyset.name} already exists. Skipping.`)
             continue
         }
 
-        const { error: keycapError } = await supabase
-            .from('keycaps')
-            .insert([keycap])
-        if (keycapError) {
+        const { error: keysetError } = await supabase
+            .from('keysets')
+            .insert([keyset])
+        if (keysetError) {
             console.error(
-                `‼️ Error inserting keycap: ${keycap.name}`,
-                keycapError.message
+                `‼️ Error inserting keyset: ${keyset.name}`,
+                keysetError.message
             )
             continue
         }
 
         if (kits.length > 0) {
             const { error: kitError } = await supabase
-                .from('keycap_kits')
+                .from('keyset_kits')
                 .insert(kits)
             if (kitError) {
                 console.error(
-                    `‼️ Error inserting kits for ${keycap.profile_keycap_id}`,
+                    `‼️ Error inserting kits for ${keyset.profile_keyset_id}`,
                     kitError.message
                 )
             } else {
                 console.log(
-                    `✅ Inserted ${kits.length} kits for ${keycap.name}`
+                    `✅ Inserted ${kits.length} kits for ${keyset.name}`
                 )
             }
         }
@@ -102,4 +102,4 @@ const syncKeycaps = async () => {
     console.log('\n🎉 All vendors synced!')
 }
 
-syncKeycaps()
+syncKeysets()
