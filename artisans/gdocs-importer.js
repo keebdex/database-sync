@@ -112,6 +112,15 @@ async function scan(maker) {
         }
     } catch (error) {
         console.error('catalogue deleted or sth went wrong', id, error.stack)
+
+        if (error.code === 404) {
+            await updateMetadata(id, {
+                disable_google_sync: true,
+                deleted: true,
+            })
+
+            console.log('maker disabled from google sync and marked deleted', id)
+        }
     }
 }
 

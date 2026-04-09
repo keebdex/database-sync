@@ -197,6 +197,10 @@ const updateSculpts = async (sculpts) => {
 }
 
 const updateMakerDatabase = async (tables) => {
+    if (!tables.length) {
+        return { modified: false, colorways: [] }
+    }
+
     const { maker_id } = tables[0]
 
     if (isDevelopment) {
