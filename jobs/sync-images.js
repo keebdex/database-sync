@@ -14,7 +14,7 @@ const DELIVERY_BASE_URL = `https://imagedelivery.net/${process.env.CF_IMAGES_ACC
 
 const makeKeysetImageId = (k) => `keyset/${k.profile_keyset_id}`
 const makeKeysetKitImageId = (k) =>
-    `keyset/${k.profile_keyset_id}/kit/${k.kit_id || k.id}`
+    `keyset/${k.profile_keyset_id}/kit/${k.id}/${k.kit_id || urlSlugify(k.name)}`
 const makeKeyboardImageId = (k) =>
     `keyboard/${k.brand_keyboard_slug}/${k.release_id}/${urlSlugify(k.variant_name)}`
 
