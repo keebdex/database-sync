@@ -1,11 +1,9 @@
-name: Keebdex Image Prune
+name: Keebdex Image Sync
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 1,15 * *" # Runs at midnight on the first and fifteenth day of every month
-  # push:
-  #   branches: [ "main" ]
+    - cron: "0 1 * * *" # Runs daily at 01:00 GMT, 3 hours after the artisan sync workflow
 
 env:
   NODE_ENV: production
@@ -14,10 +12,9 @@ env:
   CF_IMAGES_API_KEY: ${{ secrets.CF_IMAGES_API_KEY }}
   CF_IMAGES_ACCOUNT_ID: ${{ secrets.CF_IMAGES_ACCOUNT_ID }}
   CF_IMAGES_ACCOUNT_HASH: ${{ secrets.CF_IMAGES_ACCOUNT_HASH }}
-  GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
 
 jobs:
-  image-prune:
+  image-sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,5 +27,5 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Prune Cloudflare Images
-        run: bun run prune-images
+      - name: Sync images to Cloudflare
+        run: bun run sync-images

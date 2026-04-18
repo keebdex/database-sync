@@ -1,4 +1,4 @@
-name: Keebdex Database Sync
+name: Keebdex Artisan Data Sync
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ env:
   GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
 
 jobs:
-  database-sync:
+  artisan-sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,11 +36,8 @@ jobs:
           name: "keebdex.json"
           json: ${{ env.GOOGLE_SERVICE_ACCOUNT }}
 
-      - name: Sync data from Google Docs
+      - name: Sync artisan data from Google Docs
         run: bun run gdocs-importer
 
-      - name: Sync data from maker websites/APIs
+      - name: Sync artisan data from maker websites/APIs
         run: bun run maker-scraper
-
-      - name: Sync images to Cloudflare
-        run: bun run sync-images
