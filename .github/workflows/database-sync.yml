@@ -42,5 +42,5 @@ jobs:
       - name: Sync data from maker websites/APIs
         run: bun run maker-scraper
 
-      - name: Sync new keysets to database
-        run: bun run sync-keysets
+      - name: Sync images to Cloudflare
+        run: bun run sync-images

@@ -8,7 +8,7 @@
     "gdocs-importer": "node artisans/gdocs-importer.js",
     "maker-scraper": "node artisans/maker-scraper.js",
     "vendor-scraper": "node keysets/vendor-scraper.js",
-    "sync-keysets": "node jobs/sync-keysets.js",
+    "sync-images": "node jobs/sync-images.js",
     "prune-images": "node jobs/prune-images.js"
   },
   "repository": {
@@ -24,14 +24,14 @@
   "dependencies": {
     "@googleapis/docs": "^9.2.1",
     "@googleapis/drive": "^20.1.0",
-    "@supabase/supabase-js": "^2.102.1",
-    "axios": "^1.14.0",
+    "@supabase/supabase-js": "^2.103.3",
+    "axios": "^1.15.0",
     "bluebird": "^3.7.2",
     "cheerio": "^1.2.0",
     "crc": "^4.3.2",
     "date-fns": "^4.1.0",
     "deepmerge": "^4.3.1",
-    "dotenv": "^17.4.1",
+    "dotenv": "^17.4.2",
     "google-auth-library": "^10.6.2",
     "ini": "^6.0.0",
     "lodash": "^4.18.1",

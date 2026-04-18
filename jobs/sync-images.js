@@ -1,0 +1,108 @@
+require('dotenv').config()
+
+const { createClient } = require('@supabase/supabase-js')
+const Promise = require('bluebird')
+const { uploadImage } = require('../utils/image')
+const { urlSlugify } = require('../utils')
+
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+)
+
+const DELIVERY_BASE_URL = `https://imagedelivery.net/${process.env.CF_IMAGES_ACCOUNT_HASH}`
+
+const makeKeysetImageId = (k) => `keyset/${k.profile_keyset_id}`
+const makeKeyboardImageId = (k) =>
+    `keyboard/${k.brand_keyboard_slug}/${k.release_id}/${urlSlugify(k.variant_name)}`
+
+const getKeysets = async (rows = []) => {
+    const { data } = await supabase
+        .from('keysets')
+        .select('img, profile_keyset_id')
+        .not('img', 'is', null)
+        .neq('img', '')
+        .order('id')
+        .range(rows.length, rows.length + 999)
+
+    rows = rows.concat(data)
+
+    if (data.length === 1000) {
+        return getKeysets(rows)
+    }
+
+    return rows
+}
+
+const getKeyboardVariants = async (rows = []) => {
+    const { data } = await supabase
+        .from('keyboard_variants')
+        .select('id, image_url, brand_keyboard_slug, release_id, variant_name')
+        .not('image_url', 'is', null)
+        .neq('image_url', '')
+        .order('id')
+        .range(rows.length, rows.length + 999)
+
+    rows = rows.concat(data)
+
+    if (data.length === 1000) {
+        return getKeyboardVariants(rows)
+    }
+
+    return rows
+}
+
+const syncNewKeyset = async (keyset) => {
+    const filename = makeKeysetImageId(keyset)
+
+    const promise = supabase
+        .from('keysets')
+        .update({
+            img: `${DELIVERY_BASE_URL}/keyset/${keyset.profile_keyset_id}/public`,
+        })
+        .eq('profile_keyset_id', keyset.profile_keyset_id)
+
+    await uploadImage(filename, keyset.img, promise)
+}
+
+const syncNewKeyboardVariant = async (variant) => {
+    const filename = makeKeyboardImageId(variant)
+
+    const promise = supabase
+        .from('keyboard_variants')
+        .update({
+            image_url: `${DELIVERY_BASE_URL}/${filename}/public`,
+        })
+        .eq('id', variant.id)
+
+    await uploadImage(filename, variant.image_url, promise)
+}
+
+Promise.all([getKeysets(), getKeyboardVariants()])
+    .then(async ([keysets, variants]) => {
+        const unsyncedKeysets = keysets.filter(
+            (keyset) =>
+                keyset.img &&
+                !keyset.img.startsWith(`${DELIVERY_BASE_URL}/keyset/`)
+        )
+
+        const unsyncedVariants = variants.filter(
+            (variant) =>
+                variant.image_url &&
+                !variant.image_url.startsWith(`${DELIVERY_BASE_URL}/keyboard/`)
+        )
+
+        console.log('keysets to sync', unsyncedKeysets.length)
+        console.log('keyboard variants to sync', unsyncedVariants.length)
+
+        if (unsyncedKeysets.length) {
+            await Promise.map(unsyncedKeysets, syncNewKeyset, { concurrency: 5 })
+        }
+
+        if (unsyncedVariants.length) {
+            await Promise.map(unsyncedVariants, syncNewKeyboardVariant, {
+                concurrency: 5,
+            })
+        }
+    })
+    .catch(console.error)

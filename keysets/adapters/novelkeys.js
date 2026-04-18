@@ -42,7 +42,7 @@ async function fetchKeysets() {
                     description: removeHtmlTags(p.body_html),
                     status: mapStatus(p.tags),
                     review_status: 'Pending',
-                    render_img: p.images[0]?.src ?? null,
+                    // render_img: p.images[0]?.src ?? null,
                     img: p.images[0]?.src ?? null,
                 },
                 kits,

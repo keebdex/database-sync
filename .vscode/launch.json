@@ -46,11 +46,11 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Sync Keyset Images",
+            "name": "Launch Sync Images",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/jobs/sync-keysets.js"
+            "program": "${workspaceFolder}/jobs/sync-images.js"
         }
     ]
 }
