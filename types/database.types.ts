@@ -678,7 +678,6 @@ export type Database = {
           order_history: string | null
           profile_id: string
           profile_keyset_id: string
-          render_img: string | null
           review_status: Database["public"]["Enums"]["review_status"] | null
           sculpt: string | null
           start_date: string | null
@@ -699,7 +698,6 @@ export type Database = {
           order_history?: string | null
           profile_id: string
           profile_keyset_id: string
-          render_img?: string | null
           review_status?: Database["public"]["Enums"]["review_status"] | null
           sculpt?: string | null
           start_date?: string | null
@@ -720,7 +718,6 @@ export type Database = {
           order_history?: string | null
           profile_id?: string
           profile_keyset_id?: string
-          render_img?: string | null
           review_status?: Database["public"]["Enums"]["review_status"] | null
           sculpt?: string | null
           start_date?: string | null
@@ -922,6 +919,7 @@ export type Database = {
           discord: string | null
           email: string
           favorite_makers: Json
+          full_name: string | null
           id: string
           qq: string | null
           reddit: string | null
@@ -932,6 +930,7 @@ export type Database = {
           discord?: string | null
           email: string
           favorite_makers?: Json
+          full_name?: string | null
           id: string
           qq?: string | null
           reddit?: string | null
@@ -942,6 +941,7 @@ export type Database = {
           discord?: string | null
           email?: string
           favorite_makers?: Json
+          full_name?: string | null
           id?: string
           qq?: string | null
           reddit?: string | null

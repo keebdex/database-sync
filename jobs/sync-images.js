@@ -83,13 +83,13 @@ Promise.all([getKeysets(), getKeyboardVariants()])
         const unsyncedKeysets = keysets.filter(
             (keyset) =>
                 keyset.img &&
-                !keyset.img.startsWith(`${DELIVERY_BASE_URL}/keyset/`)
+                !keyset.img.includes(DELIVERY_BASE_URL)
         )
 
         const unsyncedVariants = variants.filter(
             (variant) =>
                 variant.image_url &&
-                !variant.image_url.startsWith(`${DELIVERY_BASE_URL}/keyboard/`)
+                !variant.image_url.includes(DELIVERY_BASE_URL)
         )
 
         console.log('keysets to sync', unsyncedKeysets.length)
