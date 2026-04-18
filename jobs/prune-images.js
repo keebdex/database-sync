@@ -54,6 +54,24 @@ const getKeysets = async (rows = []) => {
     return rows
 }
 
+const getKeysetKits = async (rows = []) => {
+    const { data } = await supabase
+        .from('keyset_kits')
+        .select('img')
+        .not('img', 'is', null)
+        .neq('img', '')
+        .order('id')
+        .range(rows.length, rows.length + 999)
+
+    rows = rows.concat(data)
+
+    if (data.length === 1000) {
+        return getKeysetKits(rows)
+    }
+
+    return rows
+}
+
 const getKeyboardVariants = async (rows = []) => {
     const { data } = await supabase
         .from('keyboard_variants')
@@ -72,7 +90,12 @@ const getKeyboardVariants = async (rows = []) => {
     return rows
 }
 
-Promise.all([getColorways(), getKeysets(), getKeyboardVariants()])
+Promise.all([
+    getColorways(),
+    getKeysets(),
+    getKeysetKits(),
+    getKeyboardVariants(),
+])
     .then(flattenDeep)
     .then(async (rows) => {
         const dbImages = rows

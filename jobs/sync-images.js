@@ -13,6 +13,8 @@ const supabase = createClient(
 const DELIVERY_BASE_URL = `https://imagedelivery.net/${process.env.CF_IMAGES_ACCOUNT_HASH}`
 
 const makeKeysetImageId = (k) => `keyset/${k.profile_keyset_id}`
+const makeKeysetKitImageId = (k) =>
+    `keyset/${k.profile_keyset_id}/kit/${k.kit_id || k.id}`
 const makeKeyboardImageId = (k) =>
     `keyboard/${k.brand_keyboard_slug}/${k.release_id}/${urlSlugify(k.variant_name)}`
 
@@ -29,6 +31,24 @@ const getKeysets = async (rows = []) => {
 
     if (data.length === 1000) {
         return getKeysets(rows)
+    }
+
+    return rows
+}
+
+const getKeysetKits = async (rows = []) => {
+    const { data } = await supabase
+        .from('keyset_kits')
+        .select('id, img, kit_id, name, profile_keyset_id')
+        .not('img', 'is', null)
+        .neq('img', '')
+        .order('id')
+        .range(rows.length, rows.length + 999)
+
+    rows = rows.concat(data)
+
+    if (data.length === 1000) {
+        return getKeysetKits(rows)
     }
 
     return rows
@@ -65,6 +85,19 @@ const syncNewKeyset = async (keyset) => {
     await uploadImage(filename, keyset.img, promise)
 }
 
+const syncNewKeysetKit = async (kit) => {
+    const filename = makeKeysetKitImageId(kit)
+
+    const promise = supabase
+        .from('keyset_kits')
+        .update({
+            img: `${DELIVERY_BASE_URL}/${filename}/public`,
+        })
+        .eq('id', kit.id)
+
+    await uploadImage(filename, kit.img, promise)
+}
+
 const syncNewKeyboardVariant = async (variant) => {
     const filename = makeKeyboardImageId(variant)
 
@@ -78,12 +111,18 @@ const syncNewKeyboardVariant = async (variant) => {
     await uploadImage(filename, variant.image_url, promise)
 }
 
-Promise.all([getKeysets(), getKeyboardVariants()])
-    .then(async ([keysets, variants]) => {
+Promise.all([getKeysets(), getKeysetKits(), getKeyboardVariants()])
+    .then(async ([keysets, kits, variants]) => {
         const unsyncedKeysets = keysets.filter(
             (keyset) =>
                 keyset.img &&
                 !keyset.img.includes(DELIVERY_BASE_URL)
+        )
+
+        const unsyncedKits = kits.filter(
+            (kit) =>
+                kit.img &&
+                !kit.img.includes(DELIVERY_BASE_URL)
         )
 
         const unsyncedVariants = variants.filter(
@@ -93,10 +132,15 @@ Promise.all([getKeysets(), getKeyboardVariants()])
         )
 
         console.log('keysets to sync', unsyncedKeysets.length)
+        console.log('keyset kits to sync', unsyncedKits.length)
         console.log('keyboard variants to sync', unsyncedVariants.length)
 
         if (unsyncedKeysets.length) {
             await Promise.map(unsyncedKeysets, syncNewKeyset, { concurrency: 5 })
+        }
+
+        if (unsyncedKits.length) {
+            await Promise.map(unsyncedKits, syncNewKeysetKit, { concurrency: 5 })
         }
 
         if (unsyncedVariants.length) {
