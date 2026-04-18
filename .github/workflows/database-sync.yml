@@ -3,7 +3,7 @@ name: Keebdex Database Sync
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *" # Runs daily at midnight
+    - cron: "0 22 * * *" # Runs daily at 22:00 GMT
   push:
     branches: ["main"]
 
