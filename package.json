@@ -1,7 +1,7 @@
 {
-  "name": "keebdex-database-sync",
+  "name": "keebdex-data-pipeline",
   "version": "1.0.0",
-  "description": "Automates the extraction and transformation of keycap data from both your Google Docs files and official maker websites/APIs. It then seamlessly migrates everything into a centralized database, making your precious keyset collection easily searchable, organized, and manageable.",
+  "description": "Collects, normalizes, and syncs artisan, keyset, keyboard, and image data from Google Docs and maker or vendor websites into Keebdex.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anhthang/keebdex-database-sync.git"
+    "url": "git+https://github.com/keebdex/data-pipeline.git"
   },
   "author": "Anh Thang Bui <buianhthang89@gmail.com> (https://anhthang.org)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/anhthang/keebdex-database-sync/issues"
+    "url": "https://github.com/keebdex/data-pipeline/issues"
   },
-  "homepage": "https://github.com/anhthang/keebdex-database-sync#readme",
+  "homepage": "https://github.com/keebdex/data-pipeline#readme",
   "dependencies": {
     "@googleapis/docs": "^9.2.1",
     "@googleapis/drive": "^20.1.0",

@@ -1,3 +1,5 @@
-# Keebdex Database Sync
+# Keebdex Data Pipeline
 
-Automates the extraction and transformation of keycap data from both your Google Docs files and official maker websites/APIs. It then seamlessly migrates everything into a centralized database, making your precious keycap collection easily searchable, organized, and manageable.
+Collects, normalizes, and syncs artisan, keyset, keyboard, and image data from Google Docs plus maker and vendor websites into Keebdex.
+
+This project powers the ingestion workflow behind Keebdex, including artisan imports, web scraping, vendor sync jobs, and Cloudflare image maintenance.
