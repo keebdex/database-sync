@@ -82,7 +82,14 @@ const syncNewKeyset = async (keyset) => {
         })
         .eq('profile_keyset_id', keyset.profile_keyset_id)
 
-    await uploadImage(filename, keyset.img, promise)
+    const { ok, status } = await uploadImage(filename, keyset.img, promise)
+
+    if (!ok && status === 404) {
+        await supabase
+            .from('keysets')
+            .update({ img: null })
+            .eq('profile_keyset_id', keyset.profile_keyset_id)
+    }
 }
 
 const syncNewKeysetKit = async (kit) => {
@@ -95,7 +102,14 @@ const syncNewKeysetKit = async (kit) => {
         })
         .eq('id', kit.id)
 
-    await uploadImage(filename, kit.img, promise)
+    const { ok, status } = await uploadImage(filename, kit.img, promise)
+
+    if (!ok && status === 404) {
+        await supabase
+            .from('keyset_kits')
+            .update({ img: null })
+            .eq('id', kit.id)
+    }
 }
 
 const syncNewKeyboardVariant = async (variant) => {

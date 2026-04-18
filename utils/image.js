@@ -36,21 +36,26 @@ async function uploadImage(filename, url, promise) {
         data,
     }
 
-    await axios(config)
-        .then(async ({ data }) => {
+    return axios(config)
+        .then(async () => {
             if (promise) {
                 await promise
             }
+
+            return { ok: true }
         })
         .catch(({ response, message }) => {
-            const { data } = response
+            const { data, status } = response || {}
 
             console.error(
                 'unable to upload image',
                 filename,
+                status,
                 message,
                 JSON.stringify(data)
             )
+
+            return { ok: false, status, message, data }
         })
 }
 
