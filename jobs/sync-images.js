@@ -85,10 +85,17 @@ const syncNewKeyset = async (keyset) => {
     const { ok, status } = await uploadImage(filename, keyset.img, promise)
 
     if (!ok && status === 404) {
-        await supabase
+        const { error } = await supabase
             .from('keysets')
             .update({ img: null })
             .eq('profile_keyset_id', keyset.profile_keyset_id)
+
+        if (error) {
+            console.error(
+                `Failed to remove image url for keyset ${keyset.profile_keyset_id}`,
+                error
+            )
+        }
     }
 }
 
@@ -105,10 +112,17 @@ const syncNewKeysetKit = async (kit) => {
     const { ok, status } = await uploadImage(filename, kit.img, promise)
 
     if (!ok && status === 404) {
-        await supabase
+        const { error } = await supabase
             .from('keyset_kits')
-            .update({ img: null })
+            .update({ img: '' })
             .eq('id', kit.id)
+
+        if (error) {
+            console.error(
+                `Failed to remove image url for keyset kit ${kit.id}`,
+                error
+            )
+        }
     }
 }
 
