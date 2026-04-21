@@ -348,6 +348,7 @@ export type Database = {
             | null
           release_year: number | null
           typing_angle: number | null
+          variant_specs: boolean | null
           weight_materials:
             | Database["public"]["Enums"]["keyboard_material"][]
             | null
@@ -373,6 +374,7 @@ export type Database = {
             | null
           release_year?: number | null
           typing_angle?: number | null
+          variant_specs?: boolean | null
           weight_materials?:
             | Database["public"]["Enums"]["keyboard_material"][]
             | null
@@ -398,6 +400,7 @@ export type Database = {
             | null
           release_year?: number | null
           typing_angle?: number | null
+          variant_specs?: boolean | null
           weight_materials?:
             | Database["public"]["Enums"]["keyboard_material"][]
             | null
@@ -423,50 +426,86 @@ export type Database = {
         Row: {
           brand_keyboard_slug: string
           brand_slug: string
+          case_materials:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
           created_at: string
+          currency: string | null
           finish_type: Database["public"]["Enums"]["keyboard_finish_type"]
           fts: unknown
           id: number
           img_back: string | null
           img_front: string | null
+          msrp_price: number | null
+          pcb_types: Database["public"]["Enums"]["keyboard_pcb_type"][] | null
           photo_credit: string | null
+          plate_materials:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
           release_id: number | null
           release_year: number | null
           sale_type: Database["public"]["Enums"]["sale_format"] | null
           units_produced: number | null
           variant_name: string
+          weight_materials:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
         }
         Insert: {
           brand_keyboard_slug: string
           brand_slug: string
+          case_materials?:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
           created_at?: string
+          currency?: string | null
           finish_type: Database["public"]["Enums"]["keyboard_finish_type"]
           fts?: unknown
           id?: never
           img_back?: string | null
           img_front?: string | null
+          msrp_price?: number | null
+          pcb_types?: Database["public"]["Enums"]["keyboard_pcb_type"][] | null
           photo_credit?: string | null
+          plate_materials?:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
           release_id?: number | null
           release_year?: number | null
           sale_type?: Database["public"]["Enums"]["sale_format"] | null
           units_produced?: number | null
           variant_name: string
+          weight_materials?:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
         }
         Update: {
           brand_keyboard_slug?: string
           brand_slug?: string
+          case_materials?:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
           created_at?: string
+          currency?: string | null
           finish_type?: Database["public"]["Enums"]["keyboard_finish_type"]
           fts?: unknown
           id?: never
           img_back?: string | null
           img_front?: string | null
+          msrp_price?: number | null
+          pcb_types?: Database["public"]["Enums"]["keyboard_pcb_type"][] | null
           photo_credit?: string | null
+          plate_materials?:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
           release_id?: number | null
           release_year?: number | null
           sale_type?: Database["public"]["Enums"]["sale_format"] | null
           units_produced?: number | null
           variant_name?: string
+          weight_materials?:
+            | Database["public"]["Enums"]["keyboard_material"][]
+            | null
         }
         Relationships: [
           {

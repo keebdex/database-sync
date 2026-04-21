@@ -58,7 +58,10 @@ const getKeyboardVariants = async (rows = []) => {
     const { data } = await supabase
         .from('keyboard_variants')
         .select('*')
-        .or('not.img_front.is.null,img_front.neq."",not.img_back.is.null,img_back.neq.""')
+        .not('img_front', 'is', null)
+        .neq('img_front', '')
+        .not('img_back', 'is', null)
+        .neq('img_back', '')
         .order('id')
         .range(rows.length, rows.length + 999)
 
