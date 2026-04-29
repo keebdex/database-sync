@@ -67,20 +67,41 @@ const getGDocMakers = () =>
         .then(({ data }) => data.filter((r) => Array.isArray(r.document_ids)))
 
 const getColorways = async (maker_id, rows = []) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
         .from(ARTISAN_COLORWAYS_TABLE)
         .select()
         .eq('maker_id', maker_id)
         .order('id')
         .range(rows.length, rows.length + 999)
 
-    rows = rows.concat(data)
+    if (error) {
+        console.warn(`get ${ARTISAN_COLORWAYS_TABLE} error`, maker_id, error)
+        return rows
+    }
 
-    if (data.length === 1000) {
+    const batch = data || []
+
+    rows = rows.concat(batch)
+
+    if (batch.length === 1000) {
         return getColorways(maker_id, rows)
     }
 
     return rows
+}
+
+const getSculpts = async (maker_id) => {
+    const { data, error } = await supabase
+        .from(ARTISAN_SCULPTS_TABLE)
+        .select()
+        .eq('maker_id', maker_id)
+
+    if (error) {
+        console.warn(`get ${ARTISAN_SCULPTS_TABLE} error`, maker_id, error)
+        return []
+    }
+
+    return data || []
 }
 
 const insertRows = async (table, values) => {
@@ -196,12 +217,13 @@ const updateSculpts = async (sculpts) => {
     }
 }
 
-const updateMakerDatabase = async (tables) => {
+const updateMakerDatabase = async (tables, options = {}) => {
     if (!tables.length) {
         return { modified: false, colorways: [] }
     }
 
     const { maker_id } = tables[0]
+    const { preserve_missing = false } = options
 
     if (isDevelopment) {
         writeFileSync(
@@ -214,12 +236,36 @@ const updateMakerDatabase = async (tables) => {
     }
 
     // update sculpts
-    const sculpts = tables.map(({ colorways, ...rest }) => rest)
+    let sculpts = tables.map(({ colorways, ...rest }) => rest)
+    const incomingColorways = flatten(map(tables, 'colorways'))
+    const storedColorways = await getColorways(maker_id)
+
+    if (preserve_missing) {
+        const storedSculpts = await getSculpts(maker_id)
+        const incomingSculptIds = sculpts.map((sculpt) => sculpt.sculpt_id)
+        const existingColorwayKeys = incomingColorways.map((colorway) =>
+            makeKeyByColorwayId(colorway)
+        )
+
+        sculpts = sculpts.concat(
+            storedSculpts.filter(
+                (sculpt) => !incomingSculptIds.includes(sculpt.sculpt_id)
+            )
+        )
+
+        incomingColorways.push(
+            ...storedColorways.filter(
+                (colorway) =>
+                    !colorway.deleted &&
+                    !existingColorwayKeys.includes(makeKeyByColorwayId(colorway))
+            )
+        )
+    }
+
     await updateSculpts(sculpts)
 
     // update colorways
-    const colorways = flatten(map(tables, 'colorways'))
-    const storedColorways = await getColorways(maker_id)
+    const colorways = incomingColorways
 
     const incomingKeys = colorways.map((c) => makeColorwayKey(c, true))
     const existedKeys = storedColorways.map((c) => makeColorwayKey(c, true))

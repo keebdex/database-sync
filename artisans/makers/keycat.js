@@ -137,8 +137,7 @@ const scraper = async () => {
             })
         )
 
-        // FIXME: need to find a way to merge with existing data without losing colorways
-        return [] // tables
+        return tables
     } catch (err) {
         console.error(err)
         process.exit(1)
