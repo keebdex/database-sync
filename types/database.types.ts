@@ -235,7 +235,7 @@ export type Database = {
           hex: string
           id: number
           name: string | null
-          system: string
+          system: Database["public"]["Enums"]["keyset_color_matching_system"]
         }
         Insert: {
           code: string
@@ -244,7 +244,7 @@ export type Database = {
           hex: string
           id?: number
           name?: string | null
-          system: string
+          system: Database["public"]["Enums"]["keyset_color_matching_system"]
         }
         Update: {
           code?: string
@@ -253,7 +253,7 @@ export type Database = {
           hex?: string
           id?: number
           name?: string | null
-          system?: string
+          system?: Database["public"]["Enums"]["keyset_color_matching_system"]
         }
         Relationships: []
       }
@@ -1061,6 +1061,7 @@ export type Database = {
         | "Hotswap + RGB"
         | "Bluetooth"
         | "Wired"
+      keyset_color_matching_system: "GMK" | "SP" | "Pantone" | "RAL" | "Custom"
       keyset_profile:
         | "Cherry"
         | "SA"
@@ -1286,6 +1287,7 @@ export const Constants = {
         "Bluetooth",
         "Wired",
       ],
+      keyset_color_matching_system: ["GMK", "SP", "Pantone", "RAL", "Custom"],
       keyset_profile: [
         "Cherry",
         "SA",
