@@ -253,6 +253,11 @@ const updateMakerDatabase = async (tables, options = {}) => {
             )
         )
 
+        const length = storedColorways.length
+        incomingColorways.forEach((colorway, idx) => {
+            colorway.order = length + idx
+        })
+
         incomingColorways.push(
             ...storedColorways.filter(
                 (colorway) =>

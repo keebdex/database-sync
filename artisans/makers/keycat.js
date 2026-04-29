@@ -133,7 +133,7 @@ const scraper = async () => {
                 sculpt_id,
                 name: sculpt_id.charAt(0).toUpperCase() + sculpt_id.slice(1),
                 img: colorways[0]?.img || null,
-                colorways,
+                colorways: colorways.reverse(),
             })
         )
 
