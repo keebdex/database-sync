@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js')
 const Promise = require('bluebird')
 const { writeFileSync } = require('fs')
-const { flatten, difference, map, keyBy, isEmpty } = require('lodash')
+const { flatten, difference, map, keyBy, isEmpty, groupBy } = require('lodash')
 const { deleteImage } = require('../../utils/image')
 const {
     ARTISAN_MAKERS_TABLE,
@@ -11,7 +11,7 @@ const {
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
+    process.env.SUPABASE_KEY,
 )
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -93,7 +93,7 @@ const getColorways = async (maker_id, rows = []) => {
 const getSculpts = async (maker_id) => {
     const { data, error } = await supabase
         .from(ARTISAN_SCULPTS_TABLE)
-        .select()
+        .select('*, total_colorways:artisan_colorways(count)')
         .eq('maker_id', maker_id)
 
     if (error) {
@@ -156,10 +156,10 @@ const updateSculpts = async (sculpts) => {
     const changedKeys = difference(existedKeys, incomingKeys)
 
     const tobeInserted = sculpts.filter((s) =>
-        newKeys.includes(makeSculptKey(s))
+        newKeys.includes(makeSculptKey(s)),
     )
     const tobeUpdated = storedSculpts.filter((s) =>
-        changedKeys.includes(makeSculptKey(s))
+        changedKeys.includes(makeSculptKey(s)),
     )
 
     const insertingMap = keyBy(tobeInserted, makerSculptId)
@@ -194,7 +194,7 @@ const updateSculpts = async (sculpts) => {
         await Promise.map(
             Object.entries(updateSculpt),
             ([id, data]) => updateRow(ARTISAN_SCULPTS_TABLE, id, data),
-            { concurrency: 1 }
+            { concurrency: 1 },
         )
 
         console.log('sculpts updated', Object.entries(updateSculpt).length)
@@ -205,12 +205,12 @@ const updateSculpts = async (sculpts) => {
         await deleteRows(
             ARTISAN_COLORWAYS_TABLE,
             'maker_sculpt_id',
-            deletedSculpts.map(makerSculptId)
+            deletedSculpts.map(makerSculptId),
         )
         await deleteRows(
             ARTISAN_SCULPTS_TABLE,
             'id',
-            deletedSculpts.map((s) => s.id)
+            deletedSculpts.map((s) => s.id),
         )
 
         console.log('sculpts deleted', deletedSculpts.length)
@@ -231,7 +231,7 @@ const updateMakerDatabase = async (tables, options = {}) => {
             JSON.stringify(tables, null, 2),
             () => {
                 console.log('done')
-            }
+            },
         )
     }
 
@@ -244,17 +244,25 @@ const updateMakerDatabase = async (tables, options = {}) => {
         const storedSculpts = await getSculpts(maker_id)
         const incomingSculptIds = sculpts.map((sculpt) => sculpt.sculpt_id)
         const existingColorwayKeys = incomingColorways.map((colorway) =>
-            makeKeyByColorwayId(colorway)
+            makeKeyByColorwayId(colorway),
         )
 
         sculpts = sculpts.concat(
             storedSculpts.filter(
-                (sculpt) => !incomingSculptIds.includes(sculpt.sculpt_id)
-            )
+                (sculpt) => !incomingSculptIds.includes(sculpt.sculpt_id),
+            ),
         )
 
-        const length = storedColorways.length
+        const sculptLengthMap = Object.entries(
+            groupBy(storedColorways, (s) => s.sculpt_id),
+        ).reduce((prev, [sculpt_id, clws]) => {
+            prev[sculpt_id] = clws.length
+
+            return prev
+        }, {})
+
         incomingColorways.forEach((colorway, idx) => {
+            const length = sculptLengthMap[colorway.sculpt_id] || 0
             colorway.order = length + idx
         })
 
@@ -262,8 +270,8 @@ const updateMakerDatabase = async (tables, options = {}) => {
             ...storedColorways.filter(
                 (colorway) =>
                     !colorway.deleted &&
-                    !existingColorwayKeys.includes(makeKeyByColorwayId(colorway))
-            )
+                    !existingColorwayKeys.includes(makeKeyByColorwayId(colorway)),
+            ),
         )
     }
 
@@ -279,10 +287,10 @@ const updateMakerDatabase = async (tables, options = {}) => {
     const changedKeys = difference(existedKeys, incomingKeys)
 
     const tobeInserted = colorways.filter((c) =>
-        newKeys.includes(makeColorwayKey(c, true))
+        newKeys.includes(makeColorwayKey(c, true)),
     )
     const tobeUpdated = storedColorways.filter((c) =>
-        changedKeys.includes(makeColorwayKey(c, true))
+        changedKeys.includes(makeColorwayKey(c, true)),
     )
 
     const insertingMapByColorwayId = keyBy(tobeInserted, makeKeyByColorwayId)
@@ -298,8 +306,7 @@ const updateMakerDatabase = async (tables, options = {}) => {
 
         if (insertingMapByColorwayId[keyByColorwayId]) {
             // colorway_id/img not changed
-            const { remote_img, ...rest } =
-                insertingMapByColorwayId[keyByColorwayId]
+            const { remote_img, ...rest } = insertingMapByColorwayId[keyByColorwayId]
 
             updateClw[`${c.id}__${c.colorway_id}`] = rest
             delete insertingMapByColorwayId[keyByColorwayId]
@@ -320,7 +327,7 @@ const updateMakerDatabase = async (tables, options = {}) => {
     })
 
     const insertClws = Object.values(insertingMapByColorwayId).map(
-        ({ remote_img, ...rest }) => rest
+        ({ remote_img, ...rest }) => rest,
     )
 
     let modified = false
@@ -341,7 +348,7 @@ const updateMakerDatabase = async (tables, options = {}) => {
                 const [id, old_colorway_id] = rowKey.split('__')
                 await updateRow(ARTISAN_COLORWAYS_TABLE, id, data)
             },
-            { concurrency: 1 }
+            { concurrency: 1 },
         )
 
         console.log('colorways updated', Object.entries(updateClw).length)
@@ -366,14 +373,14 @@ const updateMakerDatabase = async (tables, options = {}) => {
             async (id) => {
                 await updateRow(ARTISAN_COLORWAYS_TABLE, id, { deleted: true })
             },
-            { concurrency: 1 }
+            { concurrency: 1 },
         )
 
         // deleting colorways does not add them to any collections
         await deleteRows(
             ARTISAN_COLORWAYS_TABLE,
             'id',
-            deletedRows.filter((id) => !outdatedItems.includes(id))
+            deletedRows.filter((id) => !outdatedItems.includes(id)),
         )
 
         console.log('colorways deleted', outdatedImages.length)
