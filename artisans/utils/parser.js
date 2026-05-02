@@ -10,6 +10,7 @@ const regex = {
     oneoff: /\(oneoff\)|\(one-off\)|\(1\/1\)/gim,
     photo_credit: /\(pc (.*)\)/gim,
     qty: /\(count (\d+)\)/gim,
+    qty_same_number_fraction: /\((\d+)\/\1\)/gim,
     release_jelly_key: /\((\d{2,4}(\/|-)\d{1,2}(\/|-)\d{1,2})\)/gim,
     release: /\(([a-zA-Z0-9 ]*\d{4})\)/gim,
     stem: /\(stemtype\s+((?:topre|mx|alps|tmx|choc|bs)(?:\s+(?:topre|mx|alps|tmx|choc|bs))*)\b\)/gim,
@@ -73,9 +74,9 @@ const parseSculpt = (table, maker_id) => {
         .join('')
     let subtext = attrNodes
         ? attrNodes.paragraph.elements
-              .map((s) => s.textRun.content)
-              .join('')
-              .toLowerCase()
+            .map((s) => s.textRun.content)
+            .join('')
+            .toLowerCase()
         : ''
 
     const sculpt = {
@@ -169,10 +170,7 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
             }
 
             if (element?.inlineObjectElement?.inlineObjectId) {
-                const obj =
-                    document.inlineObjects[
-                        element.inlineObjectElement.inlineObjectId
-                    ]
+                const obj = document.inlineObjects[element.inlineObjectElement.inlineObjectId]
                 const img = get(
                     obj,
                     'inlineObjectProperties.embeddedObject.imageProperties.contentUri'
@@ -202,6 +200,12 @@ const parseColorways = (table, document, maker_id, sculpt, stem) => {
         if (oneoffMatch) {
             colorway.qty = 1
             text = text.replace(regex.oneoff, '')
+        }
+
+        const qtySameNumberFractionMatch = regex.qty_same_number_fraction.exec(text)
+        if (qtySameNumberFractionMatch) {
+            colorway.qty = Number(qtySameNumberFractionMatch[1])
+            text = text.replace(regex.qty_same_number_fraction, '')
         }
 
         const auctionMatch = regex.auction.exec(text)
