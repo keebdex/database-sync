@@ -84,6 +84,9 @@ function scan(filename) {
         .then(async ({ colorways }) => {
             await syncImages(colorways)
         })
+        .catch((error) => {
+            console.error(`Error processing maker ${maker_id}:`, error)
+        })
 }
 
 getListImages().then(async (images) => {
